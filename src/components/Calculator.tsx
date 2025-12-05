@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calculator as CalcIcon, ArrowRight } from "lucide-react";
+import { Calculator as CalcIcon, ArrowRight, CheckCircle } from "lucide-react";
 
 const Calculator = () => {
   const [projectType, setProjectType] = useState("");
@@ -10,16 +10,55 @@ const Calculator = () => {
   const [phone, setPhone] = useState("");
   const [time, setTime] = useState("");
   const [address, setAddress] = useState("");
+  const [showResult, setShowResult] = useState(false);
 
-  const projectTypes = ["Обслуживание", "Перезапуск", "Установка под ключ"];
-  const volumes = ["до 100 л", "100-250 л", "250-500 л", "более 500 л"];
-  const styles = ["Травник", "Псевдоморе", "Биотоп", "Минимализм"];
+  const projectTypes = [
+    { name: "Обслуживание", basePrice: 4500 },
+    { name: "Перезапуск", basePrice: 25000 },
+    { name: "Установка под ключ", basePrice: 120000 },
+  ];
 
-  const handleSubmit = () => {
-    const message = `Калькулятор проекта:\nТип: ${projectType}\nЛитраж: ${volume}\nСтиль: ${style}\nТелефон: ${phone}\nВремя: ${time}\nАдрес: ${address}`;
+  const volumes = [
+    { name: "до 100 л", multiplier: 1 },
+    { name: "100-250 л", multiplier: 1.5 },
+    { name: "250-500 л", multiplier: 2.2 },
+    { name: "более 500 л", multiplier: 3 },
+  ];
+
+  const styles = [
+    { name: "Травник", multiplier: 1.3 },
+    { name: "Псевдоморе", multiplier: 1.1 },
+    { name: "Биотоп", multiplier: 1.2 },
+    { name: "Минимализм", multiplier: 1 },
+  ];
+
+  const calculatedPrice = useMemo(() => {
+    const selectedType = projectTypes.find((t) => t.name === projectType);
+    const selectedVolume = volumes.find((v) => v.name === volume);
+    const selectedStyle = styles.find((s) => s.name === style);
+
+    if (!selectedType) return null;
+
+    let price = selectedType.basePrice;
+    if (selectedVolume) price *= selectedVolume.multiplier;
+    if (selectedStyle) price *= selectedStyle.multiplier;
+
+    return Math.round(price / 1000) * 1000; // Round to nearest 1000
+  }, [projectType, volume, style]);
+
+  const handleCalculate = () => {
+    if (projectType && volume && style) {
+      setShowResult(true);
+    }
+  };
+
+  const handleContact = () => {
+    const message = `Заявка с калькулятора:\nТип: ${projectType}\nЛитраж: ${volume}\nСтиль: ${style}\nРасчётная стоимость: от ${calculatedPrice?.toLocaleString("ru-RU")} ₽\nТелефон: ${phone}\nУдобное время: ${time}\nАдрес: ${address}`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
   };
+
+  const isFormValid = projectType && volume && style;
 
   return (
     <section id="calculator" className="py-24 md:py-32 bg-background relative">
@@ -56,15 +95,19 @@ const Calculator = () => {
                   <div className="space-y-2">
                     {projectTypes.map((type) => (
                       <button
-                        key={type}
-                        onClick={() => setProjectType(type)}
+                        key={type.name}
+                        type="button"
+                        onClick={() => {
+                          setProjectType(type.name);
+                          setShowResult(false);
+                        }}
                         className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
-                          projectType === type
+                          projectType === type.name
                             ? "border-bio bg-bio/10 text-foreground"
                             : "border-border/50 bg-card/50 text-muted-foreground hover:border-bio/50"
                         }`}
                       >
-                        {type}
+                        {type.name}
                       </button>
                     ))}
                   </div>
@@ -78,15 +121,19 @@ const Calculator = () => {
                   <div className="grid grid-cols-2 gap-2">
                     {styles.map((s) => (
                       <button
-                        key={s}
-                        onClick={() => setStyle(s)}
+                        key={s.name}
+                        type="button"
+                        onClick={() => {
+                          setStyle(s.name);
+                          setShowResult(false);
+                        }}
                         className={`px-4 py-3 rounded-lg border transition-all text-sm ${
-                          style === s
+                          style === s.name
                             ? "border-bio bg-bio/10 text-foreground"
                             : "border-border/50 bg-card/50 text-muted-foreground hover:border-bio/50"
                         }`}
                       >
-                        {s}
+                        {s.name}
                       </button>
                     ))}
                   </div>
@@ -103,15 +150,19 @@ const Calculator = () => {
                   <div className="grid grid-cols-2 gap-2">
                     {volumes.map((v) => (
                       <button
-                        key={v}
-                        onClick={() => setVolume(v)}
+                        key={v.name}
+                        type="button"
+                        onClick={() => {
+                          setVolume(v.name);
+                          setShowResult(false);
+                        }}
                         className={`px-4 py-3 rounded-lg border transition-all text-sm ${
-                          volume === v
+                          volume === v.name
                             ? "border-bio bg-bio/10 text-foreground"
                             : "border-border/50 bg-card/50 text-muted-foreground hover:border-bio/50"
                         }`}
                       >
-                        {v}
+                        {v.name}
                       </button>
                     ))}
                   </div>
@@ -161,21 +212,53 @@ const Calculator = () => {
               />
             </div>
 
+            {/* Result Block */}
+            {showResult && calculatedPrice && (
+              <div className="mt-8 p-6 rounded-xl bg-bio/10 border border-bio/30 animate-fade-up">
+                <div className="flex items-center gap-3 mb-4">
+                  <CheckCircle className="w-6 h-6 text-bio" />
+                  <span className="text-lg font-medium text-foreground">Предварительный расчёт</span>
+                </div>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="text-sm text-muted-foreground">Стоимость от</span>
+                  <span className="text-4xl font-bold text-gradient-bio">
+                    {calculatedPrice.toLocaleString("ru-RU")}
+                  </span>
+                  <span className="text-xl text-muted-foreground">₽</span>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Точная стоимость зависит от сложности проекта и особенностей места установки
+                </p>
+                <Button
+                  variant="bio"
+                  size="lg"
+                  onClick={handleContact}
+                  className="w-full sm:w-auto group"
+                >
+                  <span>Обсудить проект в WhatsApp</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </div>
+            )}
+
             {/* Footer */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border/30">
-              <p className="text-sm text-muted-foreground">
-                Отвечу в WhatsApp в течение часа
-              </p>
-              <Button
-                variant="bio"
-                size="lg"
-                onClick={handleSubmit}
-                className="group"
-              >
-                <span>Рассчитать стоимость</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </div>
+            {!showResult && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border/30">
+                <p className="text-sm text-muted-foreground">
+                  Отвечу в WhatsApp в течение часа
+                </p>
+                <Button
+                  variant="bio"
+                  size="lg"
+                  onClick={handleCalculate}
+                  disabled={!isFormValid}
+                  className="group"
+                >
+                  <span>Рассчитать стоимость</span>
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
