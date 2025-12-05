@@ -44,6 +44,11 @@ const Hero = () => {
       {/* Content */}
       <div className="container relative z-10 py-20 lg:py-0">
         <div className="max-w-3xl">
+          {/* Tagline */}
+          <p className="text-sm md:text-base tracking-[0.3em] uppercase text-muted-foreground/70 mb-6 animate-fade-up font-light" style={{ textShadow: '0 0 20px hsl(var(--foreground) / 0.15)' }}>
+            Аквадизайн премиум-класса
+          </p>
+
           {/* Logo/Brand */}
           <div className="flex items-center gap-3 mb-8 animate-fade-up">
             <div className="w-12 h-12 rounded-xl bg-gradient-bio flex items-center justify-center glow-bio">
