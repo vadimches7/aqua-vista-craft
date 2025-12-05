@@ -1,8 +1,6 @@
 import aboutImage from "@/assets/about-aquarium.jpg";
-
 const About = () => {
-  return (
-    <section id="about" className="py-24 md:py-32 relative overflow-hidden">
+  return <section id="about" className="py-24 md:py-32 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-card/50 to-background" />
 
@@ -11,16 +9,14 @@ const About = () => {
           {/* Image */}
           <div className="relative order-2 lg:order-1">
             <div className="relative rounded-2xl overflow-hidden glow-bio">
-              <img
-                src={aboutImage}
-                alt="Человек наслаждается созерцанием премиального аквариума"
-                className="w-full h-auto object-cover"
-              />
+              <img src={aboutImage} alt="Человек наслаждается созерцанием премиального аквариума" className="w-full h-auto object-cover" />
               <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
             </div>
             {/* Floating accent */}
             <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-bio/10 rounded-full blur-2xl animate-pulse-slow" />
-            <div className="absolute -top-6 -left-6 w-24 h-24 bg-bio/10 rounded-full blur-2xl animate-pulse-slow" style={{ animationDelay: "2s" }} />
+            <div className="absolute -top-6 -left-6 w-24 h-24 bg-bio/10 rounded-full blur-2xl animate-pulse-slow" style={{
+            animationDelay: "2s"
+          }} />
           </div>
 
           {/* Content */}
@@ -54,7 +50,7 @@ const About = () => {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 mt-10 pt-10 border-t border-border/50">
               <div>
-                <div className="text-3xl md:text-4xl font-serif font-bold text-gradient-bio">12+</div>
+                <div className="text-3xl md:text-4xl font-serif font-bold text-gradient-bio">14+</div>
                 <div className="text-sm text-muted-foreground mt-1">лет в аквадизайне</div>
               </div>
               <div>
@@ -69,8 +65,6 @@ const About = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default About;

@@ -81,7 +81,7 @@ const Hero = () => {
           <div className="flex flex-wrap gap-6 md:gap-8 animate-fade-up-delay-3">
             {facts.map((fact, index) => <div key={index} className="flex items-center gap-2 text-sm md:text-base text-muted-foreground">
                 <fact.icon className="w-4 h-4 text-bio" />
-                <span>{fact.text}</span>
+                <span className="">{fact.text}</span>
               </div>)}
           </div>
         </div>
