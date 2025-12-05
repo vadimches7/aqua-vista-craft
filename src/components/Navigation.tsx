@@ -33,7 +33,7 @@ const Navigation = () => {
           {/* Logo */}
           <a href="#" className="flex items-center gap-3">
             
-            <span className="text-lg font-semibold hidden sm:block">BioCube</span>
+            <span className="text-lg font-semibold hidden sm:block">Bio-Cube</span>
           </a>
 
           {/* Desktop Navigation */}
