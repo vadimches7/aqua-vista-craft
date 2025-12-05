@@ -65,13 +65,23 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mb-12 animate-fade-up-delay-3">
-            <Button variant="amber" size="xl" className="group">
+            <Button 
+              variant="amber" 
+              size="xl" 
+              className="group"
+              onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               <span>Рассчитать проект</span>
               <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Button>
-            <Button variant="outline-bio" size="xl" className="group">
+            <Button 
+              variant="outline-bio" 
+              size="xl" 
+              className="group"
+              onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               <Phone className="w-5 h-5" />
               <span>Экстренный выезд за 2 часа</span>
             </Button>
