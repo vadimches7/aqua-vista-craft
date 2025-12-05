@@ -1,3 +1,4 @@
+// BioCube - Premium Aquarium Website
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import Services from "@/components/Services";
