@@ -23,6 +23,7 @@ const Calculator = () => {
     { name: "100-250 л", multiplier: 1.5 },
     { name: "250-500 л", multiplier: 2.2 },
     { name: "более 500 л", multiplier: 3 },
+    { name: "Индивидуальный размер", multiplier: null },
   ];
 
   const styles = [
@@ -40,7 +41,9 @@ const Calculator = () => {
     if (!selectedType) return null;
 
     let price = selectedType.basePrice;
-    if (selectedVolume) price *= selectedVolume.multiplier;
+    if (selectedVolume && selectedVolume.multiplier !== null) {
+      price *= selectedVolume.multiplier;
+    }
     if (selectedStyle) price *= selectedStyle.multiplier;
 
     return Math.round(price / 1000) * 1000; // Round to nearest 1000
@@ -157,6 +160,8 @@ const Calculator = () => {
                           setShowResult(false);
                         }}
                         className={`px-4 py-3 rounded-lg border transition-all text-sm ${
+                          v.name === "Индивидуальный размер" ? "col-span-2" : ""
+                        } ${
                           volume === v.name
                             ? "border-bio bg-bio/10 text-foreground"
                             : "border-border/50 bg-card/50 text-muted-foreground hover:border-bio/50"

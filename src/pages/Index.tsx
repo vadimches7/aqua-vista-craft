@@ -1,6 +1,7 @@
 // BioCube - Premium Aquarium Website
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
+import InstallationTariffsSection from "@/components/InstallationTariffsSection";
 import Services from "@/components/Services";
 import About from "@/components/About";
 import Process from "@/components/Process";
@@ -18,6 +19,7 @@ const Index = () => {
       <Navigation />
       <main>
         <Hero />
+        <InstallationTariffsSection />
         <Services />
         <About />
         <Process />

@@ -1,7 +1,26 @@
 import { Button } from "@/components/ui/button";
-import { Phone, Clock, Star, Shield, FileText } from "lucide-react";
+import { Clock, Star, Shield, FileText, MessageCircleMore, X } from "lucide-react";
 import heroImage from "@/assets/hero-aquarium.jpg";
+import { useState } from "react";
 const Hero = () => {
+  const [isMessengerModalOpen, setIsMessengerModalOpen] = useState(false);
+
+  const messengerOptions = [{
+    name: "WhatsApp",
+    href: "https://wa.me/79001234567"
+  }, {
+    name: "Мессенджер Макс",
+    href: "https://m.me/aquavistacraft"
+  }, {
+    name: "Telegram",
+    href: "https://t.me/aquavistacraft"
+  }];
+
+  const openMessenger = (href: string) => {
+    window.open(href, "_blank");
+    setIsMessengerModalOpen(false);
+  };
+
   const facts = [{
     icon: Clock,
     text: "12+ лет опыта"
@@ -80,10 +99,10 @@ const Hero = () => {
               variant="outline-bio" 
               size="xl" 
               className="group"
-              onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => setIsMessengerModalOpen(true)}
             >
-              <Phone className="w-5 h-5" />
-              <span>Экстренный выезд за 2 часа</span>
+              <MessageCircleMore className="w-5 h-5" />
+              <span>Написать в мессенджер</span>
             </Button>
           </div>
 
@@ -104,6 +123,30 @@ const Hero = () => {
           <div className="w-1 h-2 bg-bio rounded-full animate-bounce" />
         </div>
       </div>
+
+      {/* Messenger modal */}
+      {isMessengerModalOpen && <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setIsMessengerModalOpen(false)} />
+          <div className="relative w-full max-w-md p-6 rounded-2xl bg-card/90 border border-border shadow-2xl animate-fade-up">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-sm text-muted-foreground">Связаться в мессенджере</p>
+                <h3 className="text-xl font-semibold text-foreground">Выберите удобный вариант</h3>
+              </div>
+              <button type="button" onClick={() => setIsMessengerModalOpen(false)} className="p-2 rounded-full hover:bg-border/50 transition" aria-label="Закрыть">
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {messengerOptions.map(option => <button key={option.name} type="button" onClick={() => openMessenger(option.href)} className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border/60 bg-card/60 hover:border-bio/60 hover:bg-bio/5 transition">
+                  <span className="text-foreground font-medium">{option.name}</span>
+                  <MessageCircleMore className="w-4 h-4 text-bio" />
+                </button>)}
+            </div>
+          </div>
+        </div>}
     </section>;
 };
 export default Hero;
+
