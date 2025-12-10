@@ -60,14 +60,15 @@ export async function createAmoCRMLead(data: LeadData): Promise<{ success: boole
     const domain = import.meta.env.VITE_AMOCRM_DOMAIN || "amocrm.ru";
     const accessToken = import.meta.env.VITE_AMOCRM_ACCESS_TOKEN;
 
+    console.log("AmoCRM: Starting lead creation", { 
+      hasToken: !!accessToken,
+      domain,
+      dataName: data.name 
+    });
+
     if (!accessToken) {
       console.error("AmoCRM access token not configured");
-      return { success: false, error: "AmoCRM токен не настроен" };
-    }
-
-    // Используем токен из переменных окружения
-    if (!accessToken) {
-      return { success: false, error: "Не удалось получить доступ к AmoCRM" };
+      return { success: false, error: "AmoCRM токен не настроен. Проверьте настройки переменных окружения." };
     }
 
     // Создаём контакт
@@ -100,9 +101,10 @@ export async function createAmoCRMLead(data: LeadData): Promise<{ success: boole
     });
 
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("AmoCRM error:", error);
-    return { success: false, error: "Ошибка при отправке заявки" };
+    const errorMessage = error?.message || "Ошибка при отправке заявки";
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -136,20 +138,48 @@ async function createContact(
 ): Promise<{ id: number }> {
   // Используем API домен из переменных окружения или стандартный
   const apiDomain = import.meta.env.VITE_AMOCRM_API_DOMAIN || "api-b.amocrm.ru";
+  
+  // Формируем правильную структуру для AmoCRM API
+  const contactPayload = {
+    name: contactData.name,
+    custom_fields_values: [] as any[],
+  };
+
+  // Добавляем телефон, если есть
+  if (contactData.phone) {
+    contactPayload.custom_fields_values.push({
+      field_code: "PHONE",
+      values: [{ value: contactData.phone, enum_code: "WORK" }],
+    });
+  }
+
+  // Добавляем email, если есть
+  if (contactData.email) {
+    contactPayload.custom_fields_values.push({
+      field_code: "EMAIL",
+      values: [{ value: contactData.email, enum_code: "WORK" }],
+    });
+  }
+
   const response = await fetch(`https://${apiDomain}/api/v4/contacts`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${accessToken}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify([contactData]),
+    body: JSON.stringify([contactPayload]),
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to create contact: ${response.statusText}`);
+    const errorText = await response.text();
+    console.error("AmoCRM contact creation error:", errorText);
+    throw new Error(`Failed to create contact: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();
+  if (!data._embedded || !data._embedded.contacts || !data._embedded.contacts[0]) {
+    throw new Error("Invalid response from AmoCRM");
+  }
   return { id: data._embedded.contacts[0].id };
 }
 
@@ -161,25 +191,20 @@ async function createLead(
   accessToken: string,
   leadData: AmoCRMLead & { contact_id?: number; custom_fields?: Record<string, any> }
 ): Promise<{ id: number }> {
-  const lead: AmoCRMLead = {
+  const lead: any = {
     name: leadData.name,
-    price: leadData.price,
   };
+
+  // Добавляем цену, если есть
+  if (leadData.price) {
+    lead.price = leadData.price;
+  }
 
   // Добавляем связь с контактом
   if (leadData.contact_id) {
-    (lead as any).contacts = [{ id: leadData.contact_id }];
-  }
-
-  // Добавляем кастомные поля (нужно настроить в AmoCRM)
-  if (leadData.custom_fields) {
-    lead.custom_fields_values = [];
-    
-    // Пример: добавляем поля (ID полей нужно получить из AmoCRM)
-    // lead.custom_fields_values.push({
-    //   field_id: 12345, // ID поля "Тип проекта"
-    //   values: [{ value: leadData.custom_fields.projectType }],
-    // });
+    lead._embedded = {
+      contacts: [{ id: leadData.contact_id }],
+    };
   }
 
   // Используем API домен из переменных окружения или стандартный
@@ -194,10 +219,15 @@ async function createLead(
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to create lead: ${response.statusText}`);
+    const errorText = await response.text();
+    console.error("AmoCRM lead creation error:", errorText);
+    throw new Error(`Failed to create lead: ${response.status} ${response.statusText}`);
   }
 
   const data = await response.json();
+  if (!data._embedded || !data._embedded.leads || !data._embedded.leads[0]) {
+    throw new Error("Invalid response from AmoCRM");
+  }
   return { id: data._embedded.leads[0].id };
 }
 
