@@ -16,16 +16,13 @@ const Navigation = () => {
     href: "#services"
   }, {
     label: "Процесс",
-    href: "#process"
+    href: "#installation-steps"
   }, {
     label: "Кейсы",
-    href: "#cases"
+    href: "#projects"
   }, {
-    label: "Тарифы",
-    href: "#pricing"
-  }, {
-    label: "FAQ",
-    href: "#faq"
+    label: "Контакты",
+    href: "#contact"
   }];
   return <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-background/80 backdrop-blur-lg border-b border-border/50" : "bg-transparent"}`}>
       <div className="container">

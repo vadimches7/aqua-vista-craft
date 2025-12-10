@@ -10,8 +10,6 @@ import WhyBioCube from "@/components/WhyBioCube";
 import ProjectsShowcase from "@/components/ProjectsShowcase";
 import About from "@/components/About";
 import Calculator from "@/components/Calculator";
-import Pricing from "@/components/Pricing";
-import FAQ from "@/components/FAQ";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 
@@ -30,8 +28,6 @@ const Index = () => {
         <ProjectsShowcase />
         <About />
         <Calculator />
-        <Pricing />
-        <FAQ />
         <Contact />
       </main>
       <Footer />

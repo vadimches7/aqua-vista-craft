@@ -6,9 +6,7 @@ import { Calculator as CalcIcon, ArrowRight, CheckCircle } from "lucide-react";
 const Calculator = () => {
   const [projectType, setProjectType] = useState("");
   const [volume, setVolume] = useState("");
-  const [style, setStyle] = useState("");
   const [phone, setPhone] = useState("");
-  const [time, setTime] = useState("");
   const [address, setAddress] = useState("");
   const [showResult, setShowResult] = useState(false);
 
@@ -26,17 +24,9 @@ const Calculator = () => {
     { name: "Индивидуальный размер", multiplier: null },
   ];
 
-  const styles = [
-    { name: "Травник", multiplier: 1.3 },
-    { name: "Псевдоморе", multiplier: 1.1 },
-    { name: "Биотоп", multiplier: 1.2 },
-    { name: "Минимализм", multiplier: 1 },
-  ];
-
   const calculatedPrice = useMemo(() => {
     const selectedType = projectTypes.find((t) => t.name === projectType);
     const selectedVolume = volumes.find((v) => v.name === volume);
-    const selectedStyle = styles.find((s) => s.name === style);
 
     if (!selectedType) return null;
 
@@ -44,13 +34,12 @@ const Calculator = () => {
     if (selectedVolume && selectedVolume.multiplier !== null) {
       price *= selectedVolume.multiplier;
     }
-    if (selectedStyle) price *= selectedStyle.multiplier;
 
     return Math.round(price / 1000) * 1000; // Round to nearest 1000
-  }, [projectType, volume, style]);
+  }, [projectType, volume]);
 
   const handleCalculate = () => {
-    if (projectType && volume && style) {
+    if (projectType && volume) {
       setShowResult(true);
     }
   };
@@ -63,20 +52,18 @@ const Calculator = () => {
       phone: phone,
       projectType: projectType,
       volume: volume,
-      style: style,
       calculatedPrice: calculatedPrice || undefined,
       address: address,
-      convenientTime: time,
       source: "calculator",
     });
 
     // Также отправляем в WhatsApp (как резервный вариант)
-    const message = `Заявка с калькулятора:\nТип: ${projectType}\nЛитраж: ${volume}\nСтиль: ${style}\nРасчётная стоимость: от ${calculatedPrice?.toLocaleString("ru-RU")} ₽\nТелефон: ${phone}\nУдобное время: ${time}\nАдрес: ${address}`;
+    const message = `Заявка с калькулятора:\nТип: ${projectType}\nЛитраж: ${volume}\nРасчётная стоимость: от ${calculatedPrice?.toLocaleString("ru-RU")} ₽\nТелефон: ${phone}\nАдрес: ${address}`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
   };
 
-  const isFormValid = projectType && volume && style;
+  const isFormValid = projectType && volume;
 
   return (
     <section id="calculator" className="py-24 md:py-32 bg-background relative">
@@ -131,31 +118,6 @@ const Calculator = () => {
                   </div>
                 </div>
 
-                {/* Style */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-3">
-                    Стиль
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {styles.map((s) => (
-                      <button
-                        key={s.name}
-                        type="button"
-                        onClick={() => {
-                          setStyle(s.name);
-                          setShowResult(false);
-                        }}
-                        className={`px-4 py-3 rounded-lg border transition-all text-sm ${
-                          style === s.name
-                            ? "border-bio bg-bio/10 text-foreground"
-                            : "border-border/50 bg-card/50 text-muted-foreground hover:border-bio/50"
-                        }`}
-                      >
-                        {s.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </div>
 
               {/* Right Column */}
@@ -198,20 +160,6 @@ const Calculator = () => {
                     placeholder="+7 (___) ___-__-__"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="bg-card/50 border-border/50 focus:border-bio"
-                  />
-                </div>
-
-                {/* Convenient Time */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-3">
-                    Удобное время
-                  </label>
-                  <Input
-                    type="text"
-                    placeholder="Например: будни после 18:00"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
                     className="bg-card/50 border-border/50 focus:border-bio"
                   />
                 </div>
