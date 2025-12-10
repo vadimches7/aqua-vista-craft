@@ -23,7 +23,7 @@ const Hero = () => {
 
   const facts = [{
     icon: Clock,
-    text: "12+ лет опыта"
+    text: "15+ лет опыта"
   }, {
     icon: Star,
     text: "90+ отзывов 4.9"
