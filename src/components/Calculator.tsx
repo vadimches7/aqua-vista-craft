@@ -55,7 +55,22 @@ const Calculator = () => {
     }
   };
 
-  const handleContact = () => {
+  const handleContact = async () => {
+    // Отправляем в AmoCRM
+    const { createAmoCRMLead } = await import("@/lib/amocrm");
+    const result = await createAmoCRMLead({
+      name: phone ? `Клиент ${phone}` : "Клиент",
+      phone: phone,
+      projectType: projectType,
+      volume: volume,
+      style: style,
+      calculatedPrice: calculatedPrice || undefined,
+      address: address,
+      convenientTime: time,
+      source: "calculator",
+    });
+
+    // Также отправляем в WhatsApp (как резервный вариант)
     const message = `Заявка с калькулятора:\nТип: ${projectType}\nЛитраж: ${volume}\nСтиль: ${style}\nРасчётная стоимость: от ${calculatedPrice?.toLocaleString("ru-RU")} ₽\nТелефон: ${phone}\nУдобное время: ${time}\nАдрес: ${address}`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
