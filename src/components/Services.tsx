@@ -1,97 +1,155 @@
-import { Droplets, RefreshCw, Home, Leaf, FlaskConical, AlertTriangle } from "lucide-react";
+import { 
+  Clock, 
+  Shield, 
+  FileCheck, 
+  FlaskConical, 
+  Palette, 
+  Zap, 
+  BadgeCheck,
+  Wallet
+} from "lucide-react";
 
 const Services = () => {
-  const services = [
+  const benefits = [
     {
-      icon: Droplets,
-      title: "Обслуживание",
-      description: "Регулярная забота о вашем подводном мире: чистая вода, аккуратные швы силикона, кристальные стекла, эстетика каждой детали.",
-      note: "Аквариум остается частью интерьера, а не проблемой.",
+      icon: Clock,
+      title: "15+ лет в аквадизайне",
+      description: "Сотни реализованных проектов. Знаем нюансы, которые не найдёте в интернете.",
+      highlight: "15+",
+      highlightLabel: "лет опыта",
     },
     {
-      icon: RefreshCw,
-      title: "Перезапуск",
-      description: "Корректный демонтаж, сохранение живности, создание новой биологии.",
-      note: "Через 7–10 дней даже сложный хайтек-интерьер снова сияет чистым зелёным акцентом.",
+      icon: Wallet,
+      title: "Прозрачная смета",
+      description: "Фиксированная цена в договоре. Никаких «доплат по ходу» — платите ровно столько, сколько обсудили.",
+      highlight: "100%",
+      highlightLabel: "прозрачность",
     },
     {
-      icon: Home,
-      title: "Установка под ключ",
-      description: "Создаю проекты, которые выглядят так, будто их строил сам архитектор дома.",
-      note: "Эстетика минимализма, скрытые трассы, тихие фильтры, идеальная линия воды.",
+      icon: Shield,
+      title: "Гарантия 5 лет",
+      description: "На оборудование, герметичность и биологию. Если что-то пойдёт не так — исправим бесплатно.",
+      highlight: "5",
+      highlightLabel: "лет гарантии",
     },
     {
-      icon: Leaf,
-      title: "Псевдоморе / Травник / Биотоп",
-      description: "Собираю композиции под атмосферу пространства: ультрасовременные «воздушные» травники, структурные псевдорефы, лесные биотопы.",
-      note: "Каждый стиль — гармония природы и архитектуры.",
+      icon: FileCheck,
+      title: "Работа по договору",
+      description: "Официальный документ с этапами, сроками и ответственностью. Юридическая защита для вас.",
+      highlight: "100%",
+      highlightLabel: "официально",
     },
     {
       icon: FlaskConical,
       title: "Лаборатория воды",
-      description: "Провожу тесты, настраиваю химию под растения и рыбу.",
-      note: "Стабильная биология = красивый, живой интерьер.",
+      description: "Регулярные тесты параметров. Предотвращаем проблемы до их появления — рыбы и растения здоровы.",
+      highlight: "12",
+      highlightLabel: "параметров",
     },
     {
-      icon: AlertTriangle,
+      icon: Palette,
+      title: "Проект под ваш интерьер",
+      description: "Не шаблонные решения, а индивидуальный дизайн. Аквариум как часть архитектуры вашего дома.",
+      highlight: "∞",
+      highlightLabel: "вариантов",
+    },
+    {
+      icon: Zap,
       title: "Экстренный выезд",
-      description: "Аварии случаются. Приезжаю быстро, стабилизирую систему, спасаю рыб и обитаемость.",
-      note: "Время реакции — 2 часа.",
+      description: "Авария в 3 ночи? Приедем и стабилизируем. Спасём рыб и дорогое оборудование.",
+      highlight: "2ч",
+      highlightLabel: "время отклика",
       urgent: true,
+    },
+    {
+      icon: BadgeCheck,
+      title: "Студия, а не частник",
+      description: "Команда специалистов, склад оборудования, страховка. Надёжность на годы вперёд.",
+      highlight: "Bio",
+      highlightLabel: "Cube",
     },
   ];
 
   return (
-    <section id="services" className="py-24 md:py-32 bg-gradient-dark relative">
+    <section id="services" className="py-24 md:py-32 bg-gradient-dark relative overflow-hidden">
       {/* Background glow */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-bio/5 rounded-full blur-3xl" />
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-bio/3 rounded-full blur-3xl" />
 
       <div className="container relative z-10">
+        {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">
-            Что именно <span className="text-gradient-bio">делаю</span>
+          <p className="text-bio text-sm font-medium tracking-widest uppercase mb-4">
+            Почему выбирают нас
+          </p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-6">
+            Что вы <span className="text-gradient-bio">получите</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Полный цикл работ с премиальными аквариумами — от первой идеи до ежедневного совершенства
+            Не просто аквариум, а уверенность в каждой детали — от проекта до сопровождения
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((service, index) => (
+        {/* Benefits Grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {benefits.map((benefit, index) => (
             <div
               key={index}
-              className={`card-premium p-8 group hover:-translate-y-2 transition-all duration-500 ${
-                service.urgent ? "border-amber/30" : ""
+              className={`card-premium p-6 group hover:-translate-y-1 transition-all duration-500 ${
+                benefit.urgent ? "border-amber/30 lg:col-span-1" : ""
               }`}
             >
-              <div
-                className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 group-hover:scale-110 ${
-                  service.urgent
-                    ? "bg-amber/20 text-amber"
-                    : "bg-bio/20 text-bio"
-                }`}
-              >
-                <service.icon className="w-7 h-7" />
+              {/* Icon & Highlight */}
+              <div className="flex items-start justify-between mb-4">
+                <div
+                  className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 ${
+                    benefit.urgent
+                      ? "bg-amber/20 text-amber"
+                      : "bg-bio/15 text-bio"
+                  }`}
+                >
+                  <benefit.icon className="w-6 h-6" />
+                </div>
+                <div className="text-right">
+                  <div className={`text-2xl font-bold ${benefit.urgent ? "text-amber" : "text-bio"}`}>
+                    {benefit.highlight}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {benefit.highlightLabel}
+                  </div>
+                </div>
               </div>
 
-              <h3 className="text-xl font-serif font-semibold mb-3 group-hover:text-bio transition-colors">
-                {service.title}
+              {/* Content */}
+              <h3 className="text-lg font-semibold mb-2 group-hover:text-bio transition-colors leading-tight">
+                {benefit.title}
               </h3>
 
-              <p className="text-muted-foreground mb-4 leading-relaxed">
-                {service.description}
-              </p>
-
-              <p
-                className={`text-sm font-medium ${
-                  service.urgent ? "text-amber" : "text-bio/80"
-                }`}
-              >
-                {service.note}
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {benefit.description}
               </p>
             </div>
           ))}
+        </div>
+
+        {/* Trust Badge */}
+        <div className="mt-12 flex justify-center">
+          <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-card/50 border border-border/50">
+            <div className="flex -space-x-2">
+              {[...Array(4)].map((_, i) => (
+                <div 
+                  key={i} 
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-bio/30 to-bio/10 border-2 border-background flex items-center justify-center text-xs text-bio font-medium"
+                >
+                  {['А', 'М', 'Д', 'С'][i]}
+                </div>
+              ))}
+            </div>
+            <div className="text-sm">
+              <span className="text-foreground font-medium">90+ довольных клиентов</span>
+              <span className="text-muted-foreground"> • рейтинг 4.9</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>

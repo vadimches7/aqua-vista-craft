@@ -36,7 +36,7 @@ const Hero = () => {
   }];
   return <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 animate-hero-bg">
         <img src={heroImage} alt="Премиальный аквариум в современном интерьере" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
@@ -46,11 +46,12 @@ const Hero = () => {
 
       {/* Floating particles effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(6)].map((_, i) => <div key={i} className="absolute w-2 h-2 rounded-full bg-bio/30 animate-float" style={{
+        {[...Array(6)].map((_, i) => <div key={i} className="absolute w-2 h-2 rounded-full bg-bio/30 animate-float opacity-0" style={{
         left: `${15 + i * 15}%`,
         top: `${20 + i % 3 * 25}%`,
-        animationDelay: `${i * 0.8}s`,
-        animationDuration: `${5 + i}s`
+        animationDelay: `${1.5 + i * 0.3}s`,
+        animationDuration: `${5 + i}s`,
+        animation: `float ${5 + i}s ease-in-out infinite ${1.5 + i * 0.3}s, particle-fade-in 1s ease-out ${1.5 + i * 0.3}s forwards`
       }} />)}
       </div>
 
@@ -58,7 +59,7 @@ const Hero = () => {
       <div className="container relative z-10 py-20 lg:py-0">
         <div className="max-w-3xl">
           {/* Tagline */}
-          <p className="text-sm md:text-base tracking-[0.3em] uppercase text-muted-foreground/70 mb-6 animate-fade-up font-light" style={{
+          <p className="text-sm md:text-base tracking-[0.3em] uppercase text-muted-foreground/70 mb-6 animate-hero-tagline font-light" style={{
           textShadow: '0 0 20px hsl(var(--foreground) / 0.15)'
         }}>
             Аквадизайн премиум-класса
@@ -68,19 +69,18 @@ const Hero = () => {
           
 
           {/* Headline */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-6 leading-tight animate-fade-up-delay-1">
-            Аквариум, который
-            <br />
-            <span className="text-gradient-bio">всегда идеален</span>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-6 leading-tight">
+            <span className="block animate-hero-title">Аквариум, который</span>
+            <span className="block text-gradient-bio-glow animate-hero-title-accent">всегда идеален</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-muted-foreground mb-6 leading-relaxed max-w-2xl animate-fade-up-delay-2">
+          <p className="text-lg md:text-xl text-muted-foreground mb-6 leading-relaxed max-w-2xl animate-hero-subtitle">
             Студия Bio-Cube: проектируем, устанавливаем и сопровождаем премиальные аквариумы под ваш интерьер.
           </p>
 
           {/* Facts - компактный блок */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8 animate-fade-up-delay-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8 animate-hero-facts">
             {facts.map((fact, index) => (
               <div key={index} className="flex items-center gap-1.5 text-sm text-muted-foreground/80">
                 <fact.icon className="w-3.5 h-3.5 text-bio/70" />
@@ -91,7 +91,7 @@ const Hero = () => {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 animate-fade-up-delay-3">
+          <div className="flex flex-col sm:flex-row gap-4 animate-hero-cta">
             <Button 
               variant="amber" 
               size="xl" 
@@ -117,7 +117,7 @@ const Hero = () => {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground animate-pulse-slow">
+      <div className="absolute bottom-8 left-1/2 flex flex-col items-center gap-2 text-muted-foreground animate-hero-scroll">
         <span className="text-xs uppercase tracking-widest">Прокрутите</span>
         <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex items-start justify-center p-2">
           <div className="w-1 h-2 bg-bio rounded-full animate-bounce" />

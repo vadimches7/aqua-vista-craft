@@ -37,7 +37,9 @@ const Navigation = () => {
               alt="BioCube Logo" 
               className="w-7 h-7 object-contain"
             />
-            <span className="text-lg font-semibold hidden sm:block">Bio-Cube</span>
+            <span className="text-lg font-semibold hidden sm:block transition-opacity duration-300">
+              {isScrolled ? "Аквадизайн премиум-класса" : "Bio-Cube"}
+            </span>
           </a>
 
           {/* Desktop Navigation */}

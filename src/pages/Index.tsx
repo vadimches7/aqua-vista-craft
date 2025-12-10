@@ -2,11 +2,13 @@
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import InstallationTariffsSection from "@/components/InstallationTariffsSection";
+import BeforeAfterSection from "@/components/BeforeAfterSection";
 import Services from "@/components/Services";
+import InstallationSteps from "@/components/InstallationSteps";
+import PricingTransparency from "@/components/PricingTransparency";
+import WhyBioCube from "@/components/WhyBioCube";
+import ProjectsShowcase from "@/components/ProjectsShowcase";
 import About from "@/components/About";
-import Process from "@/components/Process";
-import WhyUs from "@/components/WhyUs";
-import Cases from "@/components/Cases";
 import Calculator from "@/components/Calculator";
 import Pricing from "@/components/Pricing";
 import FAQ from "@/components/FAQ";
@@ -20,11 +22,13 @@ const Index = () => {
       <main>
         <Hero />
         <InstallationTariffsSection />
+        <BeforeAfterSection />
         <Services />
+        <InstallationSteps />
+        <PricingTransparency />
+        <WhyBioCube />
+        <ProjectsShowcase />
         <About />
-        <Process />
-        <WhyUs />
-        <Cases />
         <Calculator />
         <Pricing />
         <FAQ />

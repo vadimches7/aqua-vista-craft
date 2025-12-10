@@ -116,6 +116,13 @@
     background-image: linear-gradient(135deg, hsl(var(--bio-green)), hsl(var(--bio-green-light)));
   }
 
+  .text-gradient-bio-glow {
+    @apply bg-clip-text text-transparent relative;
+    background-image: linear-gradient(135deg, hsl(var(--bio-green)), hsl(var(--bio-green-light)));
+    filter: drop-shadow(0 0 30px hsl(var(--bio-green) / 0.4));
+    animation: text-glow-pulse 3s ease-in-out infinite 2s;
+  }
+
   .text-gradient-amber {
     @apply bg-clip-text text-transparent;
     background-image: linear-gradient(135deg, hsl(var(--amber)), hsl(var(--amber-light)));
@@ -201,6 +208,50 @@
     animation: fade-up 0.8s ease-out 0.3s forwards;
     opacity: 0;
   }
+
+  /* Premium hero animations */
+  .animate-hero-tagline {
+    animation: hero-tagline 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    opacity: 0;
+  }
+
+  .animate-hero-title {
+    animation: hero-title 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+    opacity: 0;
+  }
+
+  .animate-hero-title-accent {
+    animation: hero-title-accent 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s forwards;
+    opacity: 0;
+  }
+
+  .animate-hero-subtitle {
+    animation: hero-subtitle 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.7s forwards;
+    opacity: 0;
+  }
+
+  .animate-hero-facts {
+    animation: hero-facts 1s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;
+    opacity: 0;
+  }
+
+  .animate-hero-cta {
+    animation: hero-cta 1s cubic-bezier(0.22, 1, 0.36, 1) 1.1s forwards;
+    opacity: 0;
+  }
+
+  .animate-hero-scroll {
+    animation: hero-scroll 1s cubic-bezier(0.22, 1, 0.36, 1) 1.5s forwards;
+    opacity: 0;
+  }
+
+  .animate-hero-bg {
+    animation: hero-bg 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .animate-text-reveal {
+    animation: text-reveal 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
 }
 
 @keyframes float {
@@ -246,6 +297,143 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Premium hero keyframes */
+@keyframes hero-tagline {
+  0% {
+    opacity: 0;
+    letter-spacing: 0.8em;
+    filter: blur(10px);
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    letter-spacing: 0.3em;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-title {
+  0% {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hero-title-accent {
+  0% {
+    opacity: 0;
+    filter: blur(15px);
+    transform: translateY(30px) scale(0.9);
+    clip-path: inset(0 100% 0 0);
+  }
+  50% {
+    clip-path: inset(0 0 0 0);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes hero-subtitle {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(25px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-facts {
+  0% {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-cta {
+  0% {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hero-scroll {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes hero-bg {
+  0% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes text-reveal {
+  0% {
+    background-size: 0% 100%;
+  }
+  100% {
+    background-size: 100% 100%;
+  }
+}
+
+@keyframes text-glow-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px hsl(var(--bio-green) / 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 40px hsl(var(--bio-green) / 0.5));
+  }
+}
+
+@keyframes particle-fade-in {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
   }
 }
 
