@@ -69,17 +69,14 @@ const Hero = () => {
 
           {/* Headline */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-6 leading-tight animate-fade-up-delay-1">
-            Аквариум, который всегда выглядит идеально
+            Аквариум, который
             <br />
-            <span className="text-gradient-bio">создан студией Bio-Cube под ваш интерьер</span>
+            <span className="text-gradient-bio">всегда идеален</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-muted-foreground mb-4 leading-relaxed max-w-2xl animate-fade-up-delay-2">
-            Проектируем, устанавливаем и сопровождаем премиальные аквариумы, которые остаются стабильными и красивыми круглый год. Композиция, свет и биология — под стиль вашего пространства.
-          </p>
-          <p className="text-base md:text-lg text-foreground/70 mb-10 max-w-2xl animate-fade-up-delay-2">
-            Это не просто аквариум — это профессионально настроенный живой интерьерный объект, который работает без хлопот.
+          <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl animate-fade-up-delay-2">
+            Студия Bio-Cube: проектируем, устанавливаем и сопровождаем премиальные аквариумы под ваш интерьер.
           </p>
 
           {/* CTA Buttons */}
