@@ -11,8 +11,8 @@ const getImagePath = (id: string): string => {
     "rif-standard": "/images/tariffs/reef-240-standard.jpg",
     "rif-premium": "/images/tariffs/reef-240-premium.jpg",
     "altum-artificial": "/images/tariffs/Bio-cube 300 — Artificial Nature.png",
-    "altum-nature": "/images/tariffs/Bio-cube 300 — Live Nature.png",
-    "altum-reef": "/images/tariffs/Bio-cube 300 — Reef Style.png",
+    "altum-nature": "/images/tariffs/Bio-cube-300-Live-Nature.png",
+    "altum-reef": "/images/tariffs/Bio-cube-300-Reef-Style.png",
   };
   return imageMap[id] || "/images/tariffs/reef-240-start.jpg";
 };
