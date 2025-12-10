@@ -15,25 +15,42 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+/**
+ * Интерфейс проекта - структура данных для каждого кейса
+ */
 interface Project {
   id: number;
-  icon: React.ElementType;
-  location: string;
-  type: string;
-  volume: string;
-  style: string;
-  image: string;
-  challenge: string;
-  solution: string[];
-  result: string;
-  accent: string;
+  icon: React.ElementType; // Иконка из lucide-react для отображения типа проекта
+  location: string; // Локация проекта (Москва, Подмосковье и т.д.)
+  type: string; // Тип помещения (Квартира, Офис и т.д.)
+  volume: string; // Объём аквариума (240 л, 300 л и т.д.)
+  style: string; // Стиль оформления (Interior Premium, Live Nature и т.д.)
+  image: string; // Путь к изображению проекта
+  challenge: string; // Задача/проблема клиента
+  solution: string[]; // Массив решений Bio-Cube
+  result: string; // Результат работы
+  accent: string; // CSS класс для градиента фона (Tailwind)
 }
 
+/**
+ * Компонент показа проектов/кейсов BioCube
+ * Отображает портфолио с возможностью переключения между проектами
+ * Поддерживает свайп на мобильных устройствах
+ */
 const ProjectsShowcase = () => {
+  // Состояние активного проекта (индекс в массиве projects)
   const [activeProject, setActiveProject] = useState(0);
+  
+  // Состояние видимости для анимации появления
   const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  
+  // Рефы для DOM элементов
+  const sectionRef = useRef<HTMLDivElement>(null); // Референс на секцию для IntersectionObserver
+  const scrollRef = useRef<HTMLDivElement>(null); // Референс на горизонтальный скролл проектов
+  
+  // Рефы для обработки свайпа на мобильных устройствах
+  const touchStartX = useRef<number | null>(null); // X координата начала касания
+  const touchEndX = useRef<number | null>(null); // X координата конца касания
 
   const projects: Project[] = [
     {
@@ -43,7 +60,7 @@ const ProjectsShowcase = () => {
       type: "Квартира",
       volume: "240 л",
       style: "Interior Premium",
-      image: "/images/projects/project-1.jpg",
+      image: "/images/projects/project-1.png",
       challenge: "Аквариум в гостиной с панорамными окнами — не должен спорить с видом на город",
       solution: [
         "Прямые линии, светлые коряги, акцент на глубине",
@@ -60,7 +77,7 @@ const ProjectsShowcase = () => {
       type: "Загородный дом",
       volume: "300 л",
       style: "Live Nature",
-      image: "/images/projects/project-2.jpg",
+      image: "/images/projects/project-2.png",
       challenge: "«Кусочек лесного ручья» напротив камина без ощущения зоомагазина",
       solution: [
         "Живые растения, натуральное дерево и камень",
@@ -77,7 +94,7 @@ const ProjectsShowcase = () => {
       type: "IT-офис",
       volume: "240 л",
       style: "Artificial Nature",
-      image: "/images/projects/project-3.jpg",
+      image: "/images/projects/project-3.png",
       challenge: "Аквариум в open space, который выдержит рабочие будни без сложного ухода",
       solution: [
         "Искусственный декор + живые неприхотливые рыбы",
@@ -94,7 +111,7 @@ const ProjectsShowcase = () => {
       type: "Салон красоты",
       volume: "300 л",
       style: "Reef Style",
-      image: "/images/projects/project-4.jpg",
+      image: "/images/projects/project-4.png",
       challenge: "«Вау-эффект» для зоны ожидания, чтобы гости фотографировали и делились",
       solution: [
         "Псевдоморе с яркой рыбой и сложным рельефом",
@@ -111,7 +128,7 @@ const ProjectsShowcase = () => {
       type: "Квартира-студия",
       volume: "120 л",
       style: "Start Nature",
-      image: "/images/projects/project-5.jpg",
+      image: "/images/projects/project-5.png",
       challenge: "Компактный живой аквариум для первой квартиры, который не станет «болотом»",
       solution: [
         "Простые живые растения и устойчивые виды рыб",
@@ -123,12 +140,60 @@ const ProjectsShowcase = () => {
     },
   ];
 
+  /**
+   * Функция переключения между проектами
+   * @param direction - направление: "left" для предыдущего, "right" для следующего
+   * Реализует циклическое переключение (после последнего идёт первый)
+   */
   const scrollToProject = (direction: "left" | "right") => {
     if (direction === "left") {
+      // Переход к предыдущему проекту, если это первый - переходим к последнему
       setActiveProject((prev) => (prev > 0 ? prev - 1 : projects.length - 1));
     } else {
+      // Переход к следующему проекту, если это последний - переходим к первому
       setActiveProject((prev) => (prev < projects.length - 1 ? prev + 1 : 0));
     }
+  };
+
+  /**
+   * Обработка начала касания для свайпа
+   * Сохраняет начальную X координату касания
+   */
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  /**
+   * Обработка движения пальца при свайпе
+   * Обновляет конечную X координату
+   */
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  /**
+   * Обработка окончания касания
+   * Вычисляет расстояние свайпа и переключает проект при достаточном расстоянии
+   * Минимальное расстояние для срабатывания: 50px
+   */
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    // Вычисляем расстояние свайпа (положительное = влево, отрицательное = вправо)
+    const distance = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50; // Минимальное расстояние для свайпа (в пикселях)
+
+    if (distance > minSwipeDistance) {
+      // Свайп влево - переходим к следующему проекту
+      scrollToProject("right");
+    } else if (distance < -minSwipeDistance) {
+      // Свайп вправо - переходим к предыдущему проекту
+      scrollToProject("left");
+    }
+
+    // Сбрасываем значения для следующего свайпа
+    touchStartX.current = null;
+    touchEndX.current = null;
   };
 
   useEffect(() => {
@@ -207,16 +272,22 @@ const ProjectsShowcase = () => {
           </div>
         </div>
 
-        {/* Main project display */}
+        {/* Основной блок отображения проекта с поддержкой свайпа */}
         <div
           className={`transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
+          // Обработчики свайпа для мобильных устройств
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
-          <div className="grid lg:grid-cols-2 gap-8 items-stretch">
-            {/* Image side */}
+          {/* Сетка: на больших экранах 2 колонки, на мобильных - одна колонка */}
+          <div className="grid lg:grid-cols-2 gap-6 items-start">
+            {/* Блок с изображением проекта - уменьшен для лучшей видимости описания */}
+            {/* Высота: 280px на мобильных, 320px на десктопе (было 400-500px) */}
             <div className="relative group">
-              <div className="card-premium overflow-hidden h-full min-h-[400px] lg:min-h-[500px]">
+              <div className="card-premium overflow-hidden rounded-xl min-h-[280px] lg:min-h-[320px] max-h-[320px]">
                 <img
                   src={currentProject.image}
                   alt={`${currentProject.type} — ${currentProject.style}`}
@@ -271,8 +342,9 @@ const ProjectsShowcase = () => {
               </div>
             </div>
 
-            {/* Content side */}
-            <div className="flex flex-col justify-center">
+            {/* Блок с описанием проекта - теперь всегда видно, так как изображение уменьшено */}
+            {/* На десктопе добавляем небольшой отступ сверху для выравнивания */}
+            <div className="flex flex-col justify-start pt-0 lg:pt-4">
               {/* Challenge */}
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
