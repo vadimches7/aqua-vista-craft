@@ -31,8 +31,12 @@ const Navigation = () => {
       <div className="container">
         <nav className="flex items-center justify-between h-20">
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3">
-            
+          <a href="#" className="flex items-center gap-2">
+            <img 
+              src="/images/biocube-logo.png" 
+              alt="BioCube Logo" 
+              className="w-10 h-10 object-contain"
+            />
             <span className="text-lg font-semibold hidden sm:block">Bio-Cube</span>
           </a>
 
