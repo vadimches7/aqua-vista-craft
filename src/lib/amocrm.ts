@@ -55,10 +55,12 @@ interface LeadData {
 /**
  * Создаёт сделку и контакт в AmoCRM
  */
+import { amocrmConfig } from "@/config/amocrm.config";
+
 export async function createAmoCRMLead(data: LeadData): Promise<{ success: boolean; error?: string }> {
   try {
-    const domain = import.meta.env.VITE_AMOCRM_DOMAIN || "amocrm.ru";
-    const accessToken = import.meta.env.VITE_AMOCRM_ACCESS_TOKEN;
+    const domain = amocrmConfig.domain;
+    const accessToken = amocrmConfig.accessToken;
 
     console.log("AmoCRM: Starting lead creation", { 
       hasToken: !!accessToken,
@@ -136,8 +138,8 @@ async function createContact(
   accessToken: string,
   contactData: AmoCRMContact
 ): Promise<{ id: number }> {
-  // Используем API домен из переменных окружения или стандартный
-  const apiDomain = import.meta.env.VITE_AMOCRM_API_DOMAIN || "api-b.amocrm.ru";
+  // Используем API домен из конфигурации
+  const apiDomain = amocrmConfig.apiDomain;
   
   // Формируем правильную структуру для AmoCRM API
   const contactPayload = {
@@ -213,8 +215,8 @@ async function createLead(
     };
   }
 
-  // Используем API домен из переменных окружения или стандартный
-  const apiDomain = import.meta.env.VITE_AMOCRM_API_DOMAIN || "api-b.amocrm.ru";
+  // Используем API домен из конфигурации
+  const apiDomain = amocrmConfig.apiDomain;
   const response = await fetch(`https://${apiDomain}/api/v4/leads`, {
     method: "POST",
     headers: {
