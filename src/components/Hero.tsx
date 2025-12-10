@@ -75,12 +75,23 @@ const Hero = () => {
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-muted-foreground mb-10 leading-relaxed max-w-2xl animate-fade-up-delay-2">
+          <p className="text-lg md:text-xl text-muted-foreground mb-6 leading-relaxed max-w-2xl animate-fade-up-delay-2">
             Студия Bio-Cube: проектируем, устанавливаем и сопровождаем премиальные аквариумы под ваш интерьер.
           </p>
 
+          {/* Facts - компактный блок */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-8 animate-fade-up-delay-2">
+            {facts.map((fact, index) => (
+              <div key={index} className="flex items-center gap-1.5 text-sm text-muted-foreground/80">
+                <fact.icon className="w-3.5 h-3.5 text-bio/70" />
+                <span>{fact.text}</span>
+                {index < facts.length - 1 && <span className="ml-3 text-border">•</span>}
+              </div>
+            ))}
+          </div>
+
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-12 animate-fade-up-delay-3">
+          <div className="flex flex-col sm:flex-row gap-4 animate-fade-up-delay-3">
             <Button 
               variant="amber" 
               size="xl" 
@@ -101,14 +112,6 @@ const Hero = () => {
               <MessageCircleMore className="w-5 h-5" />
               <span>Написать в мессенджер</span>
             </Button>
-          </div>
-
-          {/* Facts */}
-          <div className="flex flex-wrap gap-6 md:gap-8 animate-fade-up-delay-3">
-            {facts.map((fact, index) => <div key={index} className="flex items-center gap-2 text-sm md:text-base text-muted-foreground">
-                <fact.icon className="w-4 h-4 text-bio" />
-                <span className="">{fact.text}</span>
-              </div>)}
           </div>
         </div>
       </div>
