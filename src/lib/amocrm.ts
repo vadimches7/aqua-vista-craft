@@ -172,8 +172,14 @@ async function createContact(
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("AmoCRM contact creation error:", errorText);
-    throw new Error(`Failed to create contact: ${response.status} ${response.statusText}`);
+    console.error("AmoCRM contact creation error:", {
+      status: response.status,
+      statusText: response.statusText,
+      error: errorText,
+      apiDomain,
+      hasToken: !!accessToken,
+    });
+    throw new Error(`Failed to create contact: ${response.status} ${response.statusText}. ${errorText}`);
   }
 
   const data = await response.json();
@@ -220,8 +226,14 @@ async function createLead(
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("AmoCRM lead creation error:", errorText);
-    throw new Error(`Failed to create lead: ${response.status} ${response.statusText}`);
+    console.error("AmoCRM lead creation error:", {
+      status: response.status,
+      statusText: response.statusText,
+      error: errorText,
+      apiDomain,
+      hasToken: !!accessToken,
+    });
+    throw new Error(`Failed to create lead: ${response.status} ${response.statusText}. ${errorText}`);
   }
 
   const data = await response.json();
