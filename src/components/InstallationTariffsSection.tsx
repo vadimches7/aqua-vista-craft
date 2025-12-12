@@ -206,14 +206,31 @@ const TariffCard = ({ card }: { card: PricingCard }) => {
                 </form>
               </>
             ) : (
-              <div className="text-center py-8">
-                <CheckCircle className="w-16 h-16 text-bio mx-auto mb-4" />
-                <h3 className="text-2xl font-semibold text-foreground mb-2">
-                  Заявка отправлена!
+              <div className="text-center py-8 space-y-4">
+                <CheckCircle className="w-16 h-16 text-bio mx-auto mb-2" />
+                <h3 className="text-2xl font-semibold text-foreground">
+                  Спасибо! Заявка отправлена
                 </h3>
                 <p className="text-muted-foreground">
-                  Мы свяжемся с вами в ближайшее время
+                  Собери свой идеальный аквариум онлайн. Приложение подбирает рыб и совместимость.
                 </p>
+                <Button
+                  variant="bio"
+                  size="lg"
+                  className="w-full"
+                  onClick={() => {
+                    const aggregatorUrl =
+                      import.meta.env?.NEXT_PUBLIC_AGGREGATOR_URL ||
+                      (typeof process !== "undefined" &&
+                        process.env?.NEXT_PUBLIC_AGGREGATOR_URL) ||
+                      "";
+                    if (aggregatorUrl) {
+                      window.open(aggregatorUrl, "_blank", "noopener");
+                    }
+                  }}
+                >
+                  Перейти в агрегатор
+                </Button>
               </div>
             )}
           </div>

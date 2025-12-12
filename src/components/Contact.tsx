@@ -14,6 +14,7 @@ const Contact = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -32,13 +33,12 @@ const Contact = () => {
         message: formData.message,
       });
 
-      {
-        toast({
-          title: "Заявка отправлена!",
-          description: "Отвечу в WhatsApp в течение часа.",
-        });
-        setFormData({ name: "", phone: "", message: "" });
-      }
+      toast({
+        title: "Заявка отправлена!",
+        description: "Отвечу в WhatsApp в течение часа.",
+      });
+      setFormData({ name: "", phone: "", message: "" });
+      setShowThankYou(true);
     } catch (error: any) {
       console.error("Error submitting form:", error);
       toast({
@@ -168,6 +168,48 @@ const Contact = () => {
           </div>
         </div>
       </div>
+
+      {showThankYou && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="max-w-lg w-full bg-card border border-border/60 rounded-2xl p-8 shadow-2xl space-y-4 text-center">
+            <div className="flex justify-center">
+              <CheckCircle className="w-12 h-12 text-bio" />
+            </div>
+            <h3 className="text-2xl font-semibold text-foreground">
+              Спасибо! Заявка отправлена
+            </h3>
+            <p className="text-muted-foreground">
+              Собери свой идеальный аквариум онлайн. Приложение подбирает рыб и совместимость.
+            </p>
+            <Button
+              variant="bio"
+              size="lg"
+              className="w-full"
+              onClick={() => {
+                const aggregatorUrl =
+                  import.meta.env?.NEXT_PUBLIC_AGGREGATOR_URL ||
+                  (typeof process !== "undefined" &&
+                    process.env?.NEXT_PUBLIC_AGGREGATOR_URL) ||
+                  "";
+                if (aggregatorUrl) {
+                  window.open(aggregatorUrl, "_blank", "noopener");
+                }
+                setShowThankYou(false);
+              }}
+            >
+              Перейти в агрегатор
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full"
+              onClick={() => setShowThankYou(false)}
+            >
+              Закрыть
+            </Button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

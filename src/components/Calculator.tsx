@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calculator as CalcIcon, ArrowRight, CheckCircle } from "lucide-react";
@@ -9,7 +9,8 @@ const Calculator = () => {
   const [volume, setVolume] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [showResult, setShowResult] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
 
   const projectTypes = [
     { name: "Обслуживание", basePrice: 4500 },
@@ -40,13 +41,8 @@ const Calculator = () => {
     return Math.round(price / 1000) * 1000; // Round to nearest 1000
   }, [projectType, volume]);
 
-  const handleCalculate = () => {
-    if (projectType && volume) {
-      setShowResult(true);
-    }
-  };
-
   const handleContact = async () => {
+    setIsSubmitting(true);
     try {
       await submitLead({
         name: phone ? `Клиент ${phone}` : "Клиент",
@@ -62,9 +58,11 @@ const Calculator = () => {
           .filter(Boolean)
           .join("\n"),
       });
+      setShowThankYou(true);
     } catch (error) {
       console.error("Calculator lead submit error:", error);
     }
+    setIsSubmitting(false);
 
     // Также отправляем в WhatsApp (как резервный вариант)
     const message = `Заявка с калькулятора:\nТип: ${projectType}\nЛитраж: ${volume}\nРасчётная стоимость: от ${calculatedPrice?.toLocaleString("ru-RU")} ₽\nТелефон: ${phone}\nАдрес: ${address}`;
@@ -72,7 +70,12 @@ const Calculator = () => {
     window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
   };
 
-  const isFormValid = projectType && volume;
+  const isFormValid = projectType && volume && phone;
+
+  const aggregatorUrl =
+    import.meta.env?.NEXT_PUBLIC_AGGREGATOR_URL ||
+    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_AGGREGATOR_URL) ||
+    "";
 
   return (
     <section id="calculator" className="py-24 md:py-32 bg-background relative">
@@ -189,56 +192,68 @@ const Calculator = () => {
               />
             </div>
 
-            {/* Result Block */}
-            {showResult && calculatedPrice && (
-              <div className="mt-8 p-6 rounded-xl bg-bio/10 border border-bio/30 animate-fade-up">
-                <div className="flex items-center gap-3 mb-4">
-                  <CheckCircle className="w-6 h-6 text-bio" />
-                  <span className="text-lg font-medium text-foreground">Предварительный расчёт</span>
-                </div>
-                <div className="flex items-baseline gap-2 mb-3">
-                  <span className="text-sm text-muted-foreground">Стоимость от</span>
-                  <span className="text-4xl font-bold text-gradient-bio">
-                    {calculatedPrice.toLocaleString("ru-RU")}
-                  </span>
-                  <span className="text-xl text-muted-foreground">₽</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Точная стоимость зависит от сложности проекта и особенностей места установки
-                </p>
-                <Button
-                  variant="bio"
-                  size="lg"
-                  onClick={handleContact}
-                  className="w-full sm:w-auto group"
-                >
-                  <span>Обсудить проект в WhatsApp</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </div>
-            )}
-
-            {/* Footer */}
-            {!showResult && (
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border/30">
-                <p className="text-sm text-muted-foreground">
-                  Свяжемся для уточнения деталей и отправим КП в удобный мессенджер
-                </p>
-                <Button
-                  variant="bio"
-                  size="lg"
-                  onClick={handleCalculate}
-                  disabled={!isFormValid}
-                  className="group"
-                >
-                  <span>Рассчитать стоимость</span>
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </div>
-            )}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border/30">
+              <p className="text-sm text-muted-foreground">
+                Свяжемся для уточнения деталей и отправим КП в удобный мессенджер
+              </p>
+              <Button
+                variant="bio"
+                size="lg"
+                onClick={handleContact}
+                disabled={!isFormValid || isSubmitting}
+                className="group"
+              >
+                {isSubmitting ? (
+                  <span>Отправляем заявку...</span>
+                ) : (
+                  <>
+                    <span>Обсудить проект</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+
+      {showThankYou && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
+          <div className="max-w-lg w-full bg-card border border-border/60 rounded-2xl p-8 shadow-2xl space-y-4 text-center">
+            <div className="flex justify-center">
+              <CheckCircle className="w-12 h-12 text-bio" />
+            </div>
+            <h3 className="text-2xl font-semibold text-foreground">
+              Спасибо! Заявка отправлена
+            </h3>
+            <p className="text-muted-foreground">
+              Собери свой идеальный аквариум онлайн. Приложение подбирает рыб и совместимость.
+            </p>
+            <Button
+              variant="bio"
+              size="lg"
+              className="w-full"
+              onClick={() => {
+                if (aggregatorUrl) {
+                  window.open(aggregatorUrl, "_blank", "noopener");
+                }
+                setShowThankYou(false);
+              }}
+              disabled={!aggregatorUrl}
+            >
+              Перейти в агрегатор
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full"
+              onClick={() => setShowThankYou(false)}
+            >
+              Закрыть
+            </Button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
