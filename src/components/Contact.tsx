@@ -1,53 +1,17 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Send, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { submitLead } from "@/lib/amocrm";
+import { ArrowRight, MessageCircle } from "lucide-react";
 
 const Contact = () => {
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    message: "",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showThankYou, setShowThankYou] = useState(false);
+  const aggregatorUrl =
+    import.meta.env?.NEXT_PUBLIC_AGGREGATOR_URL ||
+    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_AGGREGATOR_URL) ||
+    "";
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      await submitLead({
-        name: formData.name,
-        phone: formData.phone,
-        message: formData.message,
-      });
-
-      toast({
-        title: "Заявка отправлена!",
-        description: "Отвечу в WhatsApp в течение часа.",
-      });
-      setFormData({ name: "", phone: "", message: "" });
-      setShowThankYou(true);
-    } catch (error: any) {
-      console.error("Error submitting form:", error);
-      toast({
-        title: "Ошибка отправки",
-        description: "Попробуйте позже или свяжитесь через WhatsApp",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+  const handleAggregator = () => {
+    if (aggregatorUrl) {
+      window.open(aggregatorUrl, "_blank", "noopener");
+    } else {
+      handleWhatsApp();
     }
   };
 
@@ -80,77 +44,53 @@ const Contact = () => {
           </div>
 
           <div className="grid lg:grid-cols-5 gap-8">
-            {/* Form */}
+            {/* CTA вместо формы */}
             <div className="lg:col-span-3">
-              <form onSubmit={handleSubmit} className="card-premium p-8">
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-foreground/80 mb-2">
-                      Ваше имя
-                    </label>
-                    <Input
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Как к вам обращаться?"
-                      className="bg-secondary/50 border-border/50 focus:border-bio"
-                      required
-                    />
+              <div className="card-premium p-8 space-y-6">
+                <div className="flex items-start gap-3">
+                  <div className="mt-1 p-3 rounded-full bg-bio/10 text-bio">
+                    <MessageCircle className="w-6 h-6" />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground/80 mb-2">
-                      Телефон
-                    </label>
-                    <Input
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="+7 (___) ___-__-__"
-                      className="bg-secondary/50 border-border/50 focus:border-bio"
-                      required
-                    />
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-foreground">
+                      Оставьте заявку в агрегаторе или напишите в WhatsApp
+                    </p>
+                    <p className="text-muted-foreground">
+                      Приложение подбирает рыб и совместимость, а мы подготовим коммерческое предложение под вашу архитектуру.
+                    </p>
                   </div>
+                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-foreground/80 mb-2">
-                      Расскажите о проекте
-                    </label>
-                    <Textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder="Стиль интерьера, примерный объём, пожелания..."
-                      rows={4}
-                      className="bg-secondary/50 border-border/50 focus:border-bio resize-none"
-                    />
-                  </div>
-
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button
-                    type="submit"
-                    variant="amber"
-                    size="xl"
-                    className="w-full"
-                    disabled={isSubmitting}
+                    variant="bio"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                    onClick={handleAggregator}
+                    disabled={!aggregatorUrl}
                   >
-                    {isSubmitting ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-accent-foreground/30 border-t-accent-foreground rounded-full animate-spin" />
-                        Отправка...
-                      </>
-                    ) : (
-                      <>
-                        <Send className="w-5 h-5" />
-                        Отправить заявку
-                      </>
-                    )}
+                    <span>Перейти в агрегатор</span>
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto"
+                    onClick={handleWhatsApp}
+                  >
+                    Написать в WhatsApp
                   </Button>
                 </div>
-              </form>
+
+                {!aggregatorUrl && (
+                  <p className="text-xs text-muted-foreground">
+                    Укажите NEXT_PUBLIC_AGGREGATOR_URL, чтобы включить переход в агрегатор.
+                  </p>
+                )}
+              </div>
             </div>
 
-            {/* Info block (CTA перенесли под шаги) */}
+            {/* Info block */}
             <div className="lg:col-span-2 flex flex-col justify-center">
               <div className="text-center lg:text-left space-y-6">
                 <p className="text-muted-foreground leading-relaxed">
@@ -168,48 +108,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-
-      {showThankYou && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
-          <div className="max-w-lg w-full bg-card border border-border/60 rounded-2xl p-8 shadow-2xl space-y-4 text-center">
-            <div className="flex justify-center">
-              <CheckCircle className="w-12 h-12 text-bio" />
-            </div>
-            <h3 className="text-2xl font-semibold text-foreground">
-              Спасибо! Заявка отправлена
-            </h3>
-            <p className="text-muted-foreground">
-              Собери свой идеальный аквариум онлайн. Приложение подбирает рыб и совместимость.
-            </p>
-            <Button
-              variant="bio"
-              size="lg"
-              className="w-full"
-              onClick={() => {
-                const aggregatorUrl =
-                  import.meta.env?.NEXT_PUBLIC_AGGREGATOR_URL ||
-                  (typeof process !== "undefined" &&
-                    process.env?.NEXT_PUBLIC_AGGREGATOR_URL) ||
-                  "";
-                if (aggregatorUrl) {
-                  window.open(aggregatorUrl, "_blank", "noopener");
-                }
-                setShowThankYou(false);
-              }}
-            >
-              Перейти в агрегатор
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full"
-              onClick={() => setShowThankYou(false)}
-            >
-              Закрыть
-            </Button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };
