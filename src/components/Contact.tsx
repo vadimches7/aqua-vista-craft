@@ -24,16 +24,40 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    try {
+      // Отправляем заявку в AmoCRM через API endpoint
+      // visitor_uid автоматически добавляется из localStorage
+      const { createAmoCRMLead } = await import("@/lib/amocrm");
+      const result = await createAmoCRMLead({
+        name: formData.name,
+        phone: formData.phone,
+        message: formData.message,
+        source: "contact",
+      });
 
-    toast({
-      title: "Заявка отправлена!",
-      description: "Отвечу в WhatsApp в течение часа.",
-    });
-
-    setFormData({ name: "", phone: "", message: "" });
-    setIsSubmitting(false);
+      if (result.success) {
+        toast({
+          title: "Заявка отправлена!",
+          description: "Отвечу в WhatsApp в течение часа.",
+        });
+        setFormData({ name: "", phone: "", message: "" });
+      } else {
+        toast({
+          title: "Ошибка отправки",
+          description: result.error || "Попробуйте позже или свяжитесь через WhatsApp",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      toast({
+        title: "Ошибка отправки",
+        description: "Попробуйте позже или свяжитесь через WhatsApp",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleWhatsApp = () => {

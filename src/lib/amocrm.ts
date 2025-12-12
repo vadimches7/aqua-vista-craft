@@ -1,36 +1,13 @@
 /**
  * AmoCRM Integration
  * 
- * Для работы нужно:
- * 1. Получить API ключи в AmoCRM: Настройки → Интеграции → API
- * 2. Указать домен вашего AmoCRM (например: yourcompany.amocrm.ru)
- * 3. Создать переменные окружения:
- *    - VITE_AMOCRM_DOMAIN=yourcompany.amocrm.ru
- *    - VITE_AMOCRM_CLIENT_ID=your_client_id
- *    - VITE_AMOCRM_CLIENT_SECRET=your_client_secret
- *    - VITE_AMOCRM_REDIRECT_URI=https://yourdomain.com
+ * Отправляет заявки через API endpoint /api/lead
+ * который создаёт контакт и сделку в amoCRM с привязкой к visitor_uid
  */
 
-interface AmoCRMLead {
-  name: string;
-  price?: number;
-  custom_fields_values?: Array<{
-    field_id: number;
-    values: Array<{ value: string | number }>;
-  }>;
-}
+import { getVisitorUid } from './visitor';
 
-interface AmoCRMContact {
-  name: string;
-  phone?: string;
-  email?: string;
-  custom_fields_values?: Array<{
-    field_id: number;
-    values: Array<{ value: string }>;
-  }>;
-}
-
-interface LeadData {
+export interface LeadData {
   // Основные данные
   name: string;
   phone: string;
@@ -53,53 +30,54 @@ interface LeadData {
 }
 
 /**
- * Создаёт сделку и контакт в AmoCRM
+ * Создаёт сделку и контакт в AmoCRM через API endpoint
+ * 
+ * Автоматически добавляет visitor_uid из localStorage для связи сделки с посетителем сайта
  */
-import { amocrmConfig } from "@/config/amocrm.config";
-
 export async function createAmoCRMLead(data: LeadData): Promise<{ success: boolean; error?: string }> {
   try {
-    const domain = amocrmConfig.domain;
-    const accessToken = amocrmConfig.accessToken;
-
+    // Получаем visitor_uid из localStorage
+    // Это ключевой параметр для связи сделки с посетителем сайта
+    const visitorUid = getVisitorUid();
+    
     console.log("AmoCRM: Starting lead creation", { 
-      hasToken: !!accessToken,
-      domain,
-      dataName: data.name 
-    });
-
-    if (!accessToken) {
-      console.error("AmoCRM access token not configured");
-      return { success: false, error: "AmoCRM токен не настроен. Проверьте настройки переменных окружения." };
-    }
-
-    // Создаём контакт
-    const contact = await createContact(domain, accessToken, {
       name: data.name,
       phone: data.phone,
-      email: data.email,
+      visitorUid: visitorUid || 'not provided',
+      source: data.source 
     });
 
-    // Создаём сделку
-    const leadName = data.tariffName 
-      ? `Заявка: ${data.tariffName}`
-      : data.projectType 
-        ? `Заявка: ${data.projectType}`
-        : "Новая заявка с сайта";
+    // Определяем URL API endpoint
+    // Используем относительный путь - Vercel rewrites настроены в vercel.json
+    const apiUrl = '/api/lead';
 
-    const lead = await createLead(domain, accessToken, {
-      name: leadName,
-      price: data.calculatedPrice,
-      contact_id: contact.id,
-      custom_fields: {
-        projectType: data.projectType,
-        volume: data.volume,
-        style: data.style,
-        address: data.address,
-        convenientTime: data.convenientTime,
-        source: data.source || "website",
-        message: data.message,
+    // Отправляем запрос на сервер
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        ...data,
+        visitor_uid: visitorUid, // <-- Передаём visitor_uid на сервер
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to create lead');
+    }
+
+    console.log("AmoCRM: Lead created successfully", {
+      leadId: result.leadId,
+      contactId: result.contactId,
+      visitorUid: result.visitorUid,
     });
 
     return { success: true };
@@ -110,182 +88,5 @@ export async function createAmoCRMLead(data: LeadData): Promise<{ success: boole
   }
 }
 
-/**
- * Получает токен доступа AmoCRM
- * Использует долгосрочный токен из переменных окружения
- */
-async function getAmoCRMAccessToken(
-  domain: string,
-  clientId: string,
-  clientSecret: string
-): Promise<string | null> {
-  // Используем долгосрочный токен из переменных окружения
-  const accessToken = import.meta.env.VITE_AMOCRM_ACCESS_TOKEN;
-  
-  if (accessToken) {
-    return accessToken;
-  }
 
-  // Если токена нет, возвращаем null
-  return null;
-}
-
-/**
- * Создаёт контакт в AmoCRM
- */
-async function createContact(
-  domain: string,
-  accessToken: string,
-  contactData: AmoCRMContact
-): Promise<{ id: number }> {
-  // Используем API домен из конфигурации
-  const apiDomain = amocrmConfig.apiDomain;
-  
-  // Формируем правильную структуру для AmoCRM API
-  const contactPayload = {
-    name: contactData.name,
-    custom_fields_values: [] as any[],
-  };
-
-  // Добавляем телефон, если есть
-  if (contactData.phone) {
-    contactPayload.custom_fields_values.push({
-      field_code: "PHONE",
-      values: [{ value: contactData.phone, enum_code: "WORK" }],
-    });
-  }
-
-  // Добавляем email, если есть
-  if (contactData.email) {
-    contactPayload.custom_fields_values.push({
-      field_code: "EMAIL",
-      values: [{ value: contactData.email, enum_code: "WORK" }],
-    });
-  }
-
-  const response = await fetch(`https://${apiDomain}/api/v4/contacts`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify([contactPayload]),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("AmoCRM contact creation error:", {
-      status: response.status,
-      statusText: response.statusText,
-      error: errorText,
-      apiDomain,
-      hasToken: !!accessToken,
-    });
-    throw new Error(`Failed to create contact: ${response.status} ${response.statusText}. ${errorText}`);
-  }
-
-  const data = await response.json();
-  if (!data._embedded || !data._embedded.contacts || !data._embedded.contacts[0]) {
-    throw new Error("Invalid response from AmoCRM");
-  }
-  return { id: data._embedded.contacts[0].id };
-}
-
-/**
- * Создаёт сделку в AmoCRM
- */
-async function createLead(
-  domain: string,
-  accessToken: string,
-  leadData: AmoCRMLead & { contact_id?: number; custom_fields?: Record<string, any> }
-): Promise<{ id: number }> {
-  const lead: any = {
-    name: leadData.name,
-  };
-
-  // Добавляем цену, если есть
-  if (leadData.price) {
-    lead.price = leadData.price;
-  }
-
-  // Добавляем связь с контактом
-  if (leadData.contact_id) {
-    lead._embedded = {
-      contacts: [{ id: leadData.contact_id }],
-    };
-  }
-
-  // Используем API домен из конфигурации
-  const apiDomain = amocrmConfig.apiDomain;
-  const response = await fetch(`https://${apiDomain}/api/v4/leads`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify([lead]),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error("AmoCRM lead creation error:", {
-      status: response.status,
-      statusText: response.statusText,
-      error: errorText,
-      apiDomain,
-      hasToken: !!accessToken,
-    });
-    throw new Error(`Failed to create lead: ${response.status} ${response.statusText}. ${errorText}`);
-  }
-
-  const data = await response.json();
-  if (!data._embedded || !data._embedded.leads || !data._embedded.leads[0]) {
-    throw new Error("Invalid response from AmoCRM");
-  }
-  return { id: data._embedded.leads[0].id };
-}
-
-/**
- * Альтернативный способ: отправка через Webhook
- * Проще в настройке, но менее гибкий
- */
-export async function sendToAmoCRMWebhook(data: LeadData): Promise<{ success: boolean; error?: string }> {
-  try {
-    const webhookUrl = import.meta.env.VITE_AMOCRM_WEBHOOK_URL;
-
-    if (!webhookUrl) {
-      return { success: false, error: "Webhook URL не настроен" };
-    }
-
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: data.name,
-        phone: data.phone,
-        email: data.email,
-        projectType: data.projectType,
-        volume: data.volume,
-        style: data.style,
-        calculatedPrice: data.calculatedPrice,
-        address: data.address,
-        convenientTime: data.convenientTime,
-        source: data.source,
-        tariffName: data.tariffName,
-        message: data.message,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Webhook error: ${response.statusText}`);
-    }
-
-    return { success: true };
-  } catch (error) {
-    console.error("Webhook error:", error);
-    return { success: false, error: "Ошибка при отправке заявки" };
-  }
-}
 
