@@ -93,7 +93,7 @@ const TariffCard = ({ card }: { card: PricingCard }) => {
         className="mt-6 w-full group"
         onClick={() => setIsModalOpen(true)}
       >
-        <span>Получить точный расчёт</span>
+        <span>Уточнить под моё пространство</span>
       </Button>
 
       {/* Модальное окно с формой */}
@@ -108,7 +108,7 @@ const TariffCard = ({ card }: { card: PricingCard }) => {
               <>
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h3 className="text-2xl font-semibold text-foreground">Получить точный расчёт</h3>
+                    <h3 className="text-2xl font-semibold text-foreground">Уточнить под моё пространство</h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Тариф: {card.title}
                     </p>
@@ -264,14 +264,52 @@ const InstallationTariffsSection = () => {
           ))}
         </div>
 
+        {/* Блок "Где мы не зарабатываем" после каталога */}
+        <div className="mt-10">
+          <div className="card-premium p-8 md:p-10 border-amber/20 relative overflow-hidden h-full">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber/0 via-amber to-amber/0" />
+            <div className="flex flex-col gap-6 h-full">
+              <div className="flex-1">
+                <h3 className="text-2xl md:text-3xl font-serif font-semibold mb-4 text-foreground">
+                  Где мы <span className="text-amber">не</span> зарабатываем
+                </h3>
+                <p className="text-muted-foreground leading-relaxed mb-4">
+                  Мы не занимаемся перепродажей оборудования с большой наценкой. 
+                  Базовые позиции идут по честной рыночной цене — вы видите их в смете.
+                </p>
+                <p className="text-foreground">
+                  Наш заработок — <span className="text-bio font-medium">дизайн, опыт, настройка биологии</span> и 
+                  дальнейшее обслуживание. То, за что к нам возвращаются и рекомендуют.
+                </p>
+              </div>
+              <div className="flex flex-col items-center justify-center w-full py-6 rounded-2xl bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/20">
+                <span className="text-4xl font-bold text-amber">0%</span>
+                <span className="text-xs text-muted-foreground text-center mt-2">
+                  наценка на<br />оборудование
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="p-6 md:p-7 rounded-2xl border border-border/60 bg-card/80 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
           <div className="space-y-2 flex-1">
             <h3 className="text-2xl font-semibold text-foreground">Не нашли подходящий объём?</h3>
             <p className="text-muted-foreground">
-              Делаем аквариумы под индивидуальные размеры и ваши пожелания — под любой интерьер, от 60 до 1200 л.
+              Делаем аквариумы под индивидуальные размеры и ваши пожелания — под любой интерьер, до 2500 тысяч литров.
             </p>
           </div>
-          <Button variant="bio" size="lg" className="w-full md:w-auto">
+          <Button 
+            variant="bio" 
+            size="lg" 
+            className="w-full md:w-auto"
+            onClick={() => {
+              const contactElement = document.getElementById('contact');
+              if (contactElement) {
+                contactElement.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
             Обсудить индивидуальный проект
           </Button>
         </div>

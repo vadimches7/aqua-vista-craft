@@ -16,9 +16,39 @@ const Hero = () => {
     href: "https://t.me/aquavistacraft"
   }];
 
+  const trackEvent = (event: string, from: string, data?: Record<string, any>) => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', event, {
+        from,
+        ...data
+      });
+    }
+    // Fallback для других систем аналитики
+    if (typeof window !== 'undefined' && (window as any).dataLayer) {
+      (window as any).dataLayer.push({
+        event,
+        from,
+        ...data
+      });
+    }
+  };
+
   const openMessenger = (href: string) => {
     window.open(href, "_blank");
     setIsMessengerModalOpen(false);
+  };
+
+  const handleCalculateClick = () => {
+    trackEvent('cta_calculate_click', 'hero');
+    const calculatorElement = document.getElementById('calculator');
+    if (calculatorElement) {
+      calculatorElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleMessengerClick = () => {
+    trackEvent('messenger_modal_open', 'hero');
+    setIsMessengerModalOpen(true);
   };
 
   const facts = [{
@@ -70,13 +100,13 @@ const Hero = () => {
 
           {/* Headline */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-serif font-bold mb-6 leading-tight">
-            <span className="block animate-hero-title">Аквариум, который</span>
-            <span className="block text-gradient-bio-glow animate-hero-title-accent">всегда идеален</span>
+            <span className="block animate-hero-title">Аквариум, который становится</span>
+            <span className="block text-gradient-bio-glow animate-hero-title-accent">частью интерьера</span>
           </h1>
 
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-muted-foreground mb-6 leading-relaxed max-w-2xl animate-hero-subtitle">
-            Студия Bio-Cube: проектируем, устанавливаем и сопровождаем премиальные аквариумы под ваш интерьер.
+            Проектируем, комплектуем и запускаем живые аквариумы под архитектуру вашего пространства — от идеи до стабильной экосистемы.
           </p>
 
           {/* Facts - компактный блок */}
@@ -96,9 +126,10 @@ const Hero = () => {
               variant="amber" 
               size="xl" 
               className="group"
-              onClick={() => document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' })}
+              data-scroll-to="#calculator"
+              onClick={handleCalculateClick}
             >
-              <span>Рассчитать проект</span>
+              <span>Рассчитать стоимость</span>
               <svg className="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -107,7 +138,8 @@ const Hero = () => {
               variant="outline-bio" 
               size="xl" 
               className="group"
-              onClick={() => setIsMessengerModalOpen(true)}
+              data-action="open-messenger-modal"
+              onClick={handleMessengerClick}
             >
               <MessageCircleMore className="w-5 h-5" />
               <span>Написать в мессенджер</span>

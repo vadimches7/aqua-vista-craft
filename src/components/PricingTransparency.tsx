@@ -8,9 +8,6 @@ import {
   Truck,
   FlaskConical,
   BadgeCheck,
-  Receipt,
-  ShieldCheck,
-  FileText,
   ArrowRight,
 } from "lucide-react";
 
@@ -56,20 +53,6 @@ const PricingTransparency = () => {
     },
   ];
 
-  const guarantees = [
-    {
-      icon: Receipt,
-      text: "Понятная структура цены без скрытых доплат",
-    },
-    {
-      icon: FileText,
-      text: "Детальная смета — видно, из чего складывается стоимость",
-    },
-    {
-      icon: ShieldCheck,
-      text: "Аквариум не потребует «доплат за спасение» через месяц",
-    },
-  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -149,64 +132,25 @@ const PricingTransparency = () => {
           </div>
         </div>
 
-        {/* Honesty block */}
-        <div
-          className={`max-w-3xl mx-auto mb-16 transition-all duration-700 delay-500 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-        >
-          <div className="card-premium p-8 md:p-10 border-amber/20 relative overflow-hidden">
-            {/* Accent gradient */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber/0 via-amber to-amber/0" />
-            
-            <div className="flex flex-col md:flex-row gap-8 items-start">
-              <div className="flex-1">
-                <h3 className="text-xl md:text-2xl font-serif font-semibold mb-4 text-foreground">
-                  Где мы <span className="text-amber">не</span> зарабатываем
-                </h3>
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  Мы не занимаемся перепродажей оборудования с большой наценкой. 
-                  Базовые позиции идут по честной рыночной цене — вы видите их в смете.
-                </p>
-                <p className="text-foreground">
-                  Наш заработок — <span className="text-bio font-medium">дизайн, опыт, настройка биологии</span> и 
-                  дальнейшее обслуживание. То, за что к нам возвращаются и рекомендуют.
-                </p>
-              </div>
-              
-              {/* Visual accent */}
-              <div className="hidden md:flex flex-col items-center justify-center w-32 h-32 rounded-2xl bg-gradient-to-br from-amber/20 to-amber/5 border border-amber/20">
-                <span className="text-4xl font-bold text-amber">0%</span>
-                <span className="text-xs text-muted-foreground text-center">наценка на<br/>оборудование</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* What you get */}
+        {/* Pricing transparency summary */}
         <div
           className={`max-w-3xl mx-auto mb-12 transition-all duration-700 delay-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <h3 className="text-xl font-semibold text-center mb-6 text-foreground">
-            Что вы получаете на выходе
-          </h3>
-          
-          <div className="grid md:grid-cols-3 gap-4">
-            {guarantees.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-3 p-4 rounded-xl bg-card/50 border border-border/50"
-              >
-                <div className="w-10 h-10 rounded-full bg-bio/15 flex items-center justify-center flex-shrink-0">
-                  <item.icon className="w-5 h-5 text-bio" />
-                </div>
-                <p className="text-sm text-foreground leading-snug">
-                  {item.text}
-                </p>
-              </div>
-            ))}
+          <div className="card-premium p-8 border-amber/20 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber/0 via-amber to-amber/0" />
+            
+            <div className="text-center mb-6">
+              <h3 className="text-xl md:text-2xl font-semibold text-foreground mb-4">
+                Прозрачное ценообразование
+              </h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Понятная структура цены без скрытых доплат. Детальная смета показывает, 
+                из чего складывается стоимость. Оборудование по рыночной цене — 
+                вы видите, где заложена работа студии.
+              </p>
+            </div>
           </div>
         </div>
 

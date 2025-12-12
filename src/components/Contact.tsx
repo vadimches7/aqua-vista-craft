@@ -135,28 +135,12 @@ const Contact = () => {
               </form>
             </div>
 
-            {/* WhatsApp */}
+            {/* Info block (CTA перенесли под шаги) */}
             <div className="lg:col-span-2 flex flex-col justify-center">
               <div className="text-center lg:text-left space-y-6">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-bio/10 text-bio text-sm">
-                  <CheckCircle className="w-4 h-4" />
-                  Отвечаю в течение часа
-                </div>
-
-                <p className="text-muted-foreground">
-                  Предпочитаете мессенджер? Напишите напрямую в WhatsApp —
-                  обсудим детали и назначим время консультации.
+                <p className="text-muted-foreground leading-relaxed">
+                  Свяжемся для уточнения деталей и отправим коммерческое предложение в удобный мессенджер.
                 </p>
-
-                <Button
-                  variant="outline-bio"
-                  size="xl"
-                  onClick={handleWhatsApp}
-                  className="w-full lg:w-auto"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  Написать в WhatsApp
-                </Button>
 
                 <div className="pt-6 border-t border-border/50">
                   <div className="text-sm text-muted-foreground space-y-2">

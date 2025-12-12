@@ -21,6 +21,7 @@ const Calculator = () => {
     { name: "100-250 л", multiplier: 1.5 },
     { name: "250-500 л", multiplier: 2.2 },
     { name: "более 500 л", multiplier: 3 },
+    { name: "Не знаю", multiplier: null },
     { name: "Индивидуальный размер", multiplier: null },
   ];
 
@@ -82,7 +83,7 @@ const Calculator = () => {
             Рассчитайте <span className="text-gradient-bio">стоимость</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Средняя стоимость установки 120–300 тыс. ₽, обслуживание от 4 500 ₽/выезд. Узнаем точнее за 2 минуты.
+            Средняя стоимость установки 120–300 тыс. ₽, обслуживание от 2 500 ₽/выезд. Узнаем точнее за 2 минуты.
           </p>
         </div>
 
@@ -137,7 +138,7 @@ const Calculator = () => {
                           setShowResult(false);
                         }}
                         className={`px-4 py-3 rounded-lg border transition-all text-sm ${
-                          v.name === "Индивидуальный размер" ? "col-span-2" : ""
+                          v.name === "Индивидуальный размер" || v.name === "Не знаю" ? "col-span-2" : ""
                         } ${
                           volume === v.name
                             ? "border-bio bg-bio/10 text-foreground"
@@ -213,7 +214,7 @@ const Calculator = () => {
             {!showResult && (
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-border/30">
                 <p className="text-sm text-muted-foreground">
-                  Отвечу в WhatsApp в течение часа
+                  Свяжемся для уточнения деталей и отправим КП в удобный мессенджер
                 </p>
                 <Button
                   variant="bio"

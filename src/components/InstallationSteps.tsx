@@ -7,8 +7,10 @@ import {
   Palette, 
   Fish, 
   CalendarCheck,
-  CheckCircle2
+  CheckCircle2,
+  MessageCircle
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Step {
   number: string;
@@ -22,6 +24,7 @@ interface Step {
 const InstallationSteps = () => {
   const [visibleSteps, setVisibleSteps] = useState<Set<number>>(new Set());
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [isMessengerModalOpen, setIsMessengerModalOpen] = useState(false);
 
   const steps: Step[] = [
     {
@@ -125,6 +128,17 @@ const InstallationSteps = () => {
 
     return () => observer.disconnect();
   }, []);
+
+  const messengerOptions = [
+    { name: "WhatsApp", href: "https://wa.me/79001234567" },
+    { name: "Telegram", href: "https://t.me/aquavistacraft" },
+    { name: "Мессенджер Макс", href: "https://m.me/aquavistacraft" },
+  ];
+
+  const openMessengerLink = (href: string) => {
+    window.open(href, "_blank");
+    setIsMessengerModalOpen(false);
+  };
 
   return (
     <section
@@ -260,6 +274,75 @@ const InstallationSteps = () => {
             </p>
           </div>
         </div>
+
+        {/* CTA moved here */}
+        <div className="mt-14">
+          <div className="card-premium p-8 md:p-10 border border-bio/20 bg-card/80 flex flex-col lg:flex-row items-start lg:items-center gap-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-bio/10 text-bio text-sm">
+              <CheckCircle2 className="w-4 h-4" />
+              Свяжемся в течение часа
+            </div>
+
+            <div className="flex-1 space-y-3">
+              <p className="text-lg text-foreground font-semibold">
+                Предпочитаете мессенджер? Напишите напрямую — обсудим детали и назначим время консультации.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Сразу уточним задачи, подберём формат установки и пришлём КП в удобный для вас мессенджер.
+              </p>
+            </div>
+
+            <Button
+              variant="outline-bio"
+              size="xl"
+              onClick={() => setIsMessengerModalOpen(true)}
+              className="w-full lg:w-auto"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Написать в мессенджер
+            </Button>
+          </div>
+        </div>
+
+        {/* Messenger modal */}
+        {isMessengerModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+              onClick={() => setIsMessengerModalOpen(false)}
+            />
+            <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-2xl animate-fade-up">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Связаться в мессенджере</p>
+                  <h3 className="text-xl font-semibold text-foreground">Выберите удобный вариант</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMessengerModalOpen(false)}
+                  className="p-2 rounded-full hover:bg-border/50 transition"
+                  aria-label="Закрыть"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {messengerOptions.map((option) => (
+                  <button
+                    key={option.name}
+                    type="button"
+                    onClick={() => openMessengerLink(option.href)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border/60 bg-card/60 hover:border-bio/60 hover:bg-bio/5 transition"
+                  >
+                    <span className="text-foreground font-medium">{option.name}</span>
+                    <MessageCircle className="w-4 h-4 text-bio" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

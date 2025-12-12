@@ -1,4 +1,4 @@
-// BioCube - Premium Aquarium Website
+// Backup of current Index
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import InstallationTariffsSection from "@/components/InstallationTariffsSection";
@@ -34,3 +34,7 @@ const Index = () => {
 };
 
 export default Index;
+
+
+
+

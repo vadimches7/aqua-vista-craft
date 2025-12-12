@@ -4,7 +4,6 @@ import {
   Target,
   Home,
   FlaskConical,
-  Wallet,
   FileCheck,
   Headphones,
   Users,
@@ -39,13 +38,6 @@ const WhyBioCube = () => {
         "Выстроенная экосистема: бактерии, параметры воды, фильтрация, режим подмен. Стабильность и чистота на годы.",
     },
     {
-      icon: Wallet,
-      title: "Прозрачная стоимость",
-      subtitle: "Без скрытых накруток",
-      description:
-        "Оборудование по рыночной цене. Вы видите, из чего складывается смета и где заложена работа студии.",
-    },
-    {
       icon: FileCheck,
       title: "Договор и гарантия",
       subtitle: "До 5 лет ответственности",
@@ -67,6 +59,9 @@ const WhyBioCube = () => {
         "Люди видят аквариумы Bio-Cube у друзей, в офисах, салонах — и хотят «так же или лучше».",
     },
   ];
+
+  const highlightIndex = reasons.length - 1;
+  const highlightReason = reasons[highlightIndex];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -116,7 +111,7 @@ const WhyBioCube = () => {
 
         {/* Reasons grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
-          {reasons.slice(0, 6).map((reason, index) => (
+          {reasons.slice(0, -1).map((reason, index) => (
             <div
               key={index}
               data-index={index}
@@ -151,9 +146,9 @@ const WhyBioCube = () => {
 
         {/* Featured reason - Recommendations */}
         <div
-          data-index={6}
+          data-index={highlightIndex}
           className={`max-w-4xl mx-auto mb-16 transition-all duration-700 ${
-            visibleItems.has(6)
+            visibleItems.has(highlightIndex)
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-6"
           }`}
@@ -170,10 +165,10 @@ const WhyBioCube = () => {
               
               <div className="flex-1 text-center md:text-left">
                 <h3 className="text-xl md:text-2xl font-serif font-semibold mb-3 text-foreground">
-                  {reasons[6].title}
+                  {highlightReason?.title}
                 </h3>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  {reasons[6].description}
+                  {highlightReason?.description}
                 </p>
                 <div className="flex flex-wrap justify-center md:justify-start gap-4">
                   <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-bio/10 border border-bio/20">
@@ -197,7 +192,7 @@ const WhyBioCube = () => {
         {/* CTA */}
         <div
           className={`text-center transition-all duration-700 delay-700 ${
-            visibleItems.has(6)
+            visibleItems.has(highlightIndex)
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
           }`}
