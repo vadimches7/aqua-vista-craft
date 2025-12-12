@@ -1,16 +1,17 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Calculator as CalcIcon, ArrowRight, CheckCircle } from "lucide-react";
-import { submitLead } from "@/lib/amocrm";
+import { Calculator as CalcIcon, ArrowRight } from "lucide-react";
+import { sendToAlbato } from "@/lib/albato";
+import { openPopup } from "@/components/post-submit/postSubmitBus";
 
 const Calculator = () => {
   const [projectType, setProjectType] = useState("");
   const [volume, setVolume] = useState("");
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showThankYou, setShowThankYou] = useState(false);
 
   const projectTypes = [
     { name: "Обслуживание", basePrice: 4500 },
@@ -42,40 +43,41 @@ const Calculator = () => {
   }, [projectType, volume]);
 
   const handleContact = async () => {
+    if (!phone.trim()) {
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await submitLead({
-        name: phone ? `Клиент ${phone}` : "Клиент",
+      // Используем имя из формы, или телефон, или "Клиент" как fallback
+      const clientName = name.trim() || phone || "Клиент";
+      
+      await sendToAlbato({
+        name: clientName,
         phone: phone,
-        message: [
-          projectType ? `Тип: ${projectType}` : null,
-          volume ? `Литраж: ${volume}` : null,
-          calculatedPrice
-            ? `Расчётная стоимость: от ${calculatedPrice.toLocaleString("ru-RU")} ₽`
-            : null,
-          address ? `Адрес: ${address}` : null,
-        ]
-          .filter(Boolean)
-          .join("\n"),
+        form: 'calculator',
+        project_type: projectType || undefined,
+        volume: volume || undefined,
+        calculated_price: calculatedPrice ? `${calculatedPrice.toLocaleString("ru-RU")} ₽` : undefined,
+        address: address || undefined,
       });
-      setShowThankYou(true);
+      
+      console.log('[Calculator] Form submitted successfully, showing popup');
+      // Show post-submit popup only on success
+      // Small delay to ensure form state is updated before popup opens
+      setTimeout(() => {
+        openPopup({ source: 'calculator' });
+      }, 100);
     } catch (error) {
-      console.error("Calculator lead submit error:", error);
+      console.error("[Calculator] Form submit error:", error);
+      // Popup is NOT shown on error
+      // Ошибка отправки - пользователь может попробовать снова
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
-
-    // Также отправляем в WhatsApp (как резервный вариант)
-    const message = `Заявка с калькулятора:\nТип: ${projectType}\nЛитраж: ${volume}\nРасчётная стоимость: от ${calculatedPrice?.toLocaleString("ru-RU")} ₽\nТелефон: ${phone}\nАдрес: ${address}`;
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
   };
 
-  const isFormValid = projectType && volume && phone;
-
-  const aggregatorUrl =
-    import.meta.env?.NEXT_PUBLIC_AGGREGATOR_URL ||
-    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_AGGREGATOR_URL) ||
-    "";
+  const isFormValid = projectType && volume && phone.trim();
 
   return (
     <section id="calculator" className="py-24 md:py-32 bg-background relative">
@@ -116,7 +118,6 @@ const Calculator = () => {
                         type="button"
                         onClick={() => {
                           setProjectType(type.name);
-                          setShowResult(false);
                         }}
                         className={`w-full text-left px-4 py-3 rounded-lg border transition-all ${
                           projectType === type.name
@@ -146,7 +147,6 @@ const Calculator = () => {
                         type="button"
                         onClick={() => {
                           setVolume(v.name);
-                          setShowResult(false);
                         }}
                         className={`px-4 py-3 rounded-lg border transition-all text-sm ${
                           v.name === "Индивидуальный размер" || v.name === "Не знаю" ? "col-span-2" : ""
@@ -162,10 +162,24 @@ const Calculator = () => {
                   </div>
                 </div>
 
+                {/* Name */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-3">
+                    Ваше имя
+                  </label>
+                  <Input
+                    type="text"
+                    placeholder="Иван"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="bg-card/50 border-border/50 focus:border-bio"
+                  />
+                </div>
+
                 {/* Phone */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-3">
-                    Телефон
+                    Телефон *
                   </label>
                   <Input
                     type="tel"
@@ -173,6 +187,7 @@ const Calculator = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="bg-card/50 border-border/50 focus:border-bio"
+                    required
                   />
                 </div>
               </div>
@@ -216,44 +231,6 @@ const Calculator = () => {
           </div>
         </div>
       </div>
-
-      {showThankYou && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4">
-          <div className="max-w-lg w-full bg-card border border-border/60 rounded-2xl p-8 shadow-2xl space-y-4 text-center">
-            <div className="flex justify-center">
-              <CheckCircle className="w-12 h-12 text-bio" />
-            </div>
-            <h3 className="text-2xl font-semibold text-foreground">
-              Спасибо! Заявка отправлена
-            </h3>
-            <p className="text-muted-foreground">
-              Собери свой идеальный аквариум онлайн. Приложение подбирает рыб и совместимость.
-            </p>
-            <Button
-              variant="bio"
-              size="lg"
-              className="w-full"
-              onClick={() => {
-                if (aggregatorUrl) {
-                  window.open(aggregatorUrl, "_blank", "noopener");
-                }
-                setShowThankYou(false);
-              }}
-              disabled={!aggregatorUrl}
-            >
-              Перейти в агрегатор
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full"
-              onClick={() => setShowThankYou(false)}
-            >
-              Закрыть
-            </Button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };

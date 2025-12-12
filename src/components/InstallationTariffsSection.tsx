@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PRICING_CARDS, type PricingCard } from "@/data/pricing";
-import { ChevronDown, X, CheckCircle } from "lucide-react";
-import { submitLead } from "@/lib/amocrm";
+import { ChevronDown, X } from "lucide-react";
+import { sendToAlbato } from "@/lib/albato";
+import { openPopup } from "@/components/post-submit/postSubmitBus";
 
 // Маппинг id карточки к пути изображения
 const getImagePath = (id: string): string => {
@@ -23,7 +24,6 @@ const TariffCard = ({ card }: { card: PricingCard }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   return (
     <div className="card-premium h-full flex flex-col p-6 border border-border/60 bg-card/70 hover:border-bio/60 transition-all duration-200 shadow-lg shadow-black/10 overflow-hidden">
@@ -105,134 +105,101 @@ const TariffCard = ({ card }: { card: PricingCard }) => {
             onClick={() => !isSubmitting && setIsModalOpen(false)}
           />
           <div className="relative w-full max-w-md p-6 rounded-2xl bg-card border border-border shadow-2xl animate-fade-up">
-            {!isSuccess ? (
-              <>
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="text-2xl font-semibold text-foreground">Уточнить под моё пространство</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Тариф: {card.title}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                    className="p-2 rounded-full hover:bg-border/50 transition"
-                    disabled={isSubmitting}
-                    aria-label="Закрыть"
-                  >
-                    <X className="w-5 h-5 text-muted-foreground" />
-                  </button>
-                </div>
-
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    if (!formData.name.trim() || !formData.phone.trim()) {
-                      return;
-                    }
-
-                    setIsSubmitting(true);
-                    try {
-                      await submitLead({
-                        name: formData.name,
-                        phone: formData.phone,
-                        message: `Заявка по тарифу: ${card.title} (${card.price})`,
-                      });
-
-                      setIsSuccess(true);
-                      setTimeout(() => {
-                        setIsModalOpen(false);
-                        setIsSuccess(false);
-                        setFormData({ name: "", phone: "" });
-                      }, 2000);
-                    } catch (error: any) {
-                      console.error("Error submitting form:", error);
-                      // В случае ошибки всё равно отправляем в WhatsApp как резервный вариант
-                      const message = `Здравствуйте! Меня зовут ${formData.name}, телефон ${formData.phone}. Интересует тариф "${card.title}" (${card.price}). Хочу получить точный расчёт.`;
-                      const encodedMessage = encodeURIComponent(message);
-                      window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
-                      
-                      setIsSuccess(true);
-                      setTimeout(() => {
-                        setIsModalOpen(false);
-                        setIsSuccess(false);
-                        setFormData({ name: "", phone: "" });
-                      }, 2000);
-                    }
-                    setIsSubmitting(false);
-                  }}
-                  className="space-y-4"
-                >
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Ваше имя *
-                    </label>
-                    <Input
-                      type="text"
-                      placeholder="Иван"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                      disabled={isSubmitting}
-                      className="bg-card/50 border-border/50 focus:border-bio"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
-                      Номер телефона *
-                    </label>
-                    <Input
-                      type="tel"
-                      placeholder="+7 (___) ___-__-__"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      required
-                      disabled={isSubmitting}
-                      className="bg-card/50 border-border/50 focus:border-bio"
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    variant="bio"
-                    size="lg"
-                    className="w-full"
-                    disabled={!formData.name.trim() || !formData.phone.trim() || isSubmitting}
-                  >
-                    {isSubmitting ? "Отправка..." : "Отправить заявку"}
-                  </Button>
-                </form>
-              </>
-            ) : (
-              <div className="text-center py-8 space-y-4">
-                <CheckCircle className="w-16 h-16 text-bio mx-auto mb-2" />
-                <h3 className="text-2xl font-semibold text-foreground">
-                  Спасибо! Заявка отправлена
-                </h3>
-                <p className="text-muted-foreground">
-                  Собери свой идеальный аквариум онлайн. Приложение подбирает рыб и совместимость.
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-2xl font-semibold text-foreground">Уточнить под моё пространство</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Тариф: {card.title}
                 </p>
-                <Button
-                  variant="bio"
-                  size="lg"
-                  className="w-full"
-                  onClick={() => {
-                    const aggregatorUrl =
-                      import.meta.env?.NEXT_PUBLIC_AGGREGATOR_URL ||
-                      (typeof process !== "undefined" &&
-                        process.env?.NEXT_PUBLIC_AGGREGATOR_URL) ||
-                      "";
-                    if (aggregatorUrl) {
-                      window.open(aggregatorUrl, "_blank", "noopener");
-                    }
-                  }}
-                >
-                  Перейти в агрегатор
-                </Button>
               </div>
-            )}
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="p-2 rounded-full hover:bg-border/50 transition"
+                disabled={isSubmitting}
+                aria-label="Закрыть"
+              >
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!formData.name.trim() || !formData.phone.trim()) {
+                  return;
+                }
+
+                setIsSubmitting(true);
+                try {
+                  await sendToAlbato({
+                    name: formData.name,
+                    phone: formData.phone,
+                    form: 'tariff',
+                    tariff_title: card.title,
+                    tariff_price: card.price,
+                  });
+
+                  console.log('[Tariff] Form submitted successfully, showing popup');
+                  // Show post-submit popup only on success
+                  // Close modal first, then show popup with small delay to ensure proper rendering
+                  setIsModalOpen(false);
+                  setFormData({ name: "", phone: "" });
+                  // Small delay to ensure modal is closed before popup opens
+                  setTimeout(() => {
+                    openPopup({ source: 'tariffs' });
+                  }, 100);
+                } catch (error: any) {
+                  console.error("[Tariff] Form submit error:", error);
+                  // Popup НЕ показывается при ошибке
+                  // Ошибка отправки - пользователь может попробовать снова
+                  // Модальное окно остается открытым, чтобы пользователь мог повторить попытку
+                } finally {
+                  setIsSubmitting(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Ваше имя *
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Иван"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  disabled={isSubmitting}
+                  className="bg-card/50 border-border/50 focus:border-bio"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Номер телефона *
+                </label>
+                <Input
+                  type="tel"
+                  placeholder="+7 (___) ___-__-__"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  required
+                  disabled={isSubmitting}
+                  className="bg-card/50 border-border/50 focus:border-bio"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                variant="bio"
+                size="lg"
+                className="w-full"
+                disabled={!formData.name.trim() || !formData.phone.trim() || isSubmitting}
+              >
+                {isSubmitting ? "Отправка..." : "Отправить заявку"}
+              </Button>
+            </form>
           </div>
         </div>
       )}

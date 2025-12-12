@@ -189,3 +189,5 @@ console.log('Lead created successfully:', {
 1. Откройте Vercel Dashboard
 2. Перейдите в Functions → /api/lead
 3. Просмотрите логи выполнения
+
+

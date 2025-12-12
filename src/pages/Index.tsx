@@ -27,6 +27,18 @@ const Index = () => {
         <About />
         <Calculator />
         <Contact />
+        <section className="pb-16 md:pb-24">
+          <div className="container">
+            <div className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-xl">
+              <img
+                src="/images/projects/aquarium-lounge.png"
+                alt="Большой аквариум с подводным ландшафтом"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
