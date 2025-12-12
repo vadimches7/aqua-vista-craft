@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, Send, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { submitLead } from "@/lib/amocrm";
 
 const Contact = () => {
   const { toast } = useToast();
@@ -25,28 +26,18 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Отправляем заявку в AmoCRM через API endpoint
-      // visitor_uid автоматически добавляется из localStorage
-      const { createAmoCRMLead } = await import("@/lib/amocrm");
-      const result = await createAmoCRMLead({
+      await submitLead({
         name: formData.name,
         phone: formData.phone,
         message: formData.message,
-        source: "contact",
       });
 
-      if (result.success) {
+      {
         toast({
           title: "Заявка отправлена!",
           description: "Отвечу в WhatsApp в течение часа.",
         });
         setFormData({ name: "", phone: "", message: "" });
-      } else {
-        toast({
-          title: "Ошибка отправки",
-          description: result.error || "Попробуйте позже или свяжитесь через WhatsApp",
-          variant: "destructive",
-        });
       }
     } catch (error: any) {
       console.error("Error submitting form:", error);

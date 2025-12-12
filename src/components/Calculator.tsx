@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calculator as CalcIcon, ArrowRight, CheckCircle } from "lucide-react";
+import { submitLead } from "@/lib/amocrm";
 
 const Calculator = () => {
   const [projectType, setProjectType] = useState("");
@@ -46,17 +47,24 @@ const Calculator = () => {
   };
 
   const handleContact = async () => {
-    // Отправляем в AmoCRM
-    const { createAmoCRMLead } = await import("@/lib/amocrm");
-    const result = await createAmoCRMLead({
-      name: phone ? `Клиент ${phone}` : "Клиент",
-      phone: phone,
-      projectType: projectType,
-      volume: volume,
-      calculatedPrice: calculatedPrice || undefined,
-      address: address,
-      source: "calculator",
-    });
+    try {
+      await submitLead({
+        name: phone ? `Клиент ${phone}` : "Клиент",
+        phone: phone,
+        message: [
+          projectType ? `Тип: ${projectType}` : null,
+          volume ? `Литраж: ${volume}` : null,
+          calculatedPrice
+            ? `Расчётная стоимость: от ${calculatedPrice.toLocaleString("ru-RU")} ₽`
+            : null,
+          address ? `Адрес: ${address}` : null,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      });
+    } catch (error) {
+      console.error("Calculator lead submit error:", error);
+    }
 
     // Также отправляем в WhatsApp (как резервный вариант)
     const message = `Заявка с калькулятора:\nТип: ${projectType}\nЛитраж: ${volume}\nРасчётная стоимость: от ${calculatedPrice?.toLocaleString("ru-RU")} ₽\nТелефон: ${phone}\nАдрес: ${address}`;

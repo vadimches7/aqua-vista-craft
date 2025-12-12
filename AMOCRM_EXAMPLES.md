@@ -63,7 +63,10 @@ if (visitorUid) {
 ```typescript
 import { getVisitorUid } from '@/lib/visitor';
 
-const response = await fetch('/api/lead', {
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+if (!API_BASE) throw new Error('NEXT_PUBLIC_API_BASE is not defined');
+
+const response = await fetch(`${API_BASE}/api/lead`, {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -132,16 +135,21 @@ interface LeadData {
 localStorage.getItem('amo_visitor_uid')
 
 // Отправить тестовую заявку
-fetch('/api/lead', {
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE;
+if (!API_BASE) throw new Error('NEXT_PUBLIC_API_BASE is not defined');
+
+fetch(`${API_BASE}/api/lead`, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
     name: 'Test User',
     phone: '+79991234567',
-    visitor_uid: localStorage.getItem('amo_visitor_uid'),
+    visitor_uid: localStorage.getItem('amo_visitor_uid') || undefined,
     source: 'test'
   })
-}).then(r => r.json()).then(console.log)
+})
+  .then(r => r.json())
+  .then(console.log)
 ```
 
 ### В amoCRM:

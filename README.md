@@ -71,3 +71,25 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+
+## amoCRM lead capture runbook
+
+### Required env vars
+- `NEXT_PUBLIC_API_BASE` (frontend, e.g. `https://<project>.vercel.app`)
+- `AMOCRM_ACCESS_TOKEN` (server, long-lived token)
+- `AMOCRM_API_DOMAIN` (server, e.g. `api-b.amocrm.ru`)
+
+### Manual test (curl)
+```bash
+curl -X POST "$NEXT_PUBLIC_API_BASE/api/lead" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Тест","phone":"+79990000000","email":"test@bio-cube.ru","message":"Ping","visitor_uid":"test-uid-123"}'
+```
+Expected: JSON `{ "ok": true, "leadId": <number>, "contactId": <number>, "visitor_uid": "test-uid-123" }`
+
+### Browser checklist
+- `localStorage.getItem("amo_visitor_uid")` returns value
+- Network request URL is `${NEXT_PUBLIC_API_BASE}/api/lead` (not relative)
+- Response `content-type` is `application/json`
+- Lead appears in amoCRM and is bound to visitor (pixel)
+- If `NEXT_PUBLIC_API_BASE` is unset, client throws a clear error

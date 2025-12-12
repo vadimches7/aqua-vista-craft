@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PRICING_CARDS, type PricingCard } from "@/data/pricing";
 import { ChevronDown, X, CheckCircle } from "lucide-react";
+import { submitLead } from "@/lib/amocrm";
 
 // Маппинг id карточки к пути изображения
 const getImagePath = (id: string): string => {
@@ -133,40 +134,21 @@ const TariffCard = ({ card }: { card: PricingCard }) => {
 
                     setIsSubmitting(true);
                     try {
-                      // Отправляем заявку в AmoCRM
-                      const { createAmoCRMLead } = await import("@/lib/amocrm");
-                      const result = await createAmoCRMLead({
+                      await submitLead({
                         name: formData.name,
                         phone: formData.phone,
-                        tariffName: card.title,
-                        source: "tariff",
                         message: `Заявка по тарифу: ${card.title} (${card.price})`,
                       });
 
-                      if (result.success) {
-                        setIsSuccess(true);
-                        setTimeout(() => {
-                          setIsModalOpen(false);
-                          setIsSuccess(false);
-                          setFormData({ name: "", phone: "" });
-                        }, 2000);
-                      } else {
-                        console.error("AmoCRM error:", result.error);
-                        // Если AmoCRM не работает, отправляем в WhatsApp как резервный вариант
-                        const message = `Здравствуйте! Меня зовут ${formData.name}, телефон ${formData.phone}. Интересует тариф "${card.title}" (${card.price}). Хочу получить точный расчёт.`;
-                        const encodedMessage = encodeURIComponent(message);
-                        window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
-                        
-                        setIsSuccess(true);
-                        setTimeout(() => {
-                          setIsModalOpen(false);
-                          setIsSuccess(false);
-                          setFormData({ name: "", phone: "" });
-                        }, 2000);
-                      }
+                      setIsSuccess(true);
+                      setTimeout(() => {
+                        setIsModalOpen(false);
+                        setIsSuccess(false);
+                        setFormData({ name: "", phone: "" });
+                      }, 2000);
                     } catch (error: any) {
                       console.error("Error submitting form:", error);
-                      // В случае ошибки всё равно показываем успех и отправляем в WhatsApp
+                      // В случае ошибки всё равно отправляем в WhatsApp как резервный вариант
                       const message = `Здравствуйте! Меня зовут ${formData.name}, телефон ${formData.phone}. Интересует тариф "${card.title}" (${card.price}). Хочу получить точный расчёт.`;
                       const encodedMessage = encodeURIComponent(message);
                       window.open(`https://wa.me/79001234567?text=${encodedMessage}`, "_blank");
@@ -178,6 +160,7 @@ const TariffCard = ({ card }: { card: PricingCard }) => {
                         setFormData({ name: "", phone: "" });
                       }, 2000);
                     }
+                    setIsSubmitting(false);
                   }}
                   className="space-y-4"
                 >
